@@ -1,0 +1,18 @@
+.venv/
+.cache/
+__pycache__/
+*.pyc
+*.pth
+*.pt
+*.bin
+*.bak
+*.zip
+checkpoints/
+coco_dataset/
+ImageCaption_Linh_source.zip
+kaggle (1).json
+python
+*.egg-info/
+.env
+webapp/uploads/
+*.log

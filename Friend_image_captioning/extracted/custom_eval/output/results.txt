@@ -1,0 +1,18 @@
+==================================================
+  Custom Evaluation Report
+==================================================
+  Images: 20
+  Decoding: beam=1
+  Predictions: D:\Python AI learning SIC\Ai Learning\mobilenet_clip_captioning\custom_eval\output\predictions.json
+
+  Sample predictions:
+    2022_3_30_637842470238437307_iphone-13-pink.webp
+      Generated: A picture of a stop sign with a picture of a cow .
+    3575e54d-95f0-4437-839b-c5db396ef98c.jpg
+      Generated: A young boy and a girl are looking at the camera .
+    4a12aec0-3997-4fc8-b45f-df34675e243f.jpg
+      Generated: A person laying on a bed with a suitcase .
+    5e62e7f4-6b34-462c-917f-47954c951d3a.jpg
+      Generated: A book is sitting on a book on a table .
+    6f2b0691-8ef6-484b-a095-ff6f3b3d6bd2.jpg
+      Generated: A laptop computer sitting on top of a table .

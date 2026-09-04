@@ -1,0 +1,62 @@
+[
+  {
+    "id": "f36e7fb5",
+    "image_name": "24396fd9_test.jpg",
+    "original_caption": "a little girl standing in a field of flowers",
+    "corrected_caption": "a young girl in a white dress standing among yellow flowers",
+    "model": "BLIP (Salesforce)",
+    "verified": false,
+    "verify_reason": "The corrected caption incorrectly describes the person as wearing a white dress when the dress is red and pink.",
+    "timestamp": "2026-08-22T17:16:00.538543"
+  },
+  {
+    "id": "688292a1",
+    "image_name": "24396fd9_test.jpg",
+    "original_caption": "a little girl standing in a field of flowers",
+    "corrected_caption": "a little girl in a red dress standing in a field of flowers",
+    "model": "BLIP (Salesforce)",
+    "verified": true,
+    "verify_reason": "The corrected caption accurately adds the prominent red dress detail while remaining grammatically correct.",
+    "timestamp": "2026-08-22T19:35:02.836823"
+  },
+  {
+    "id": "9b1edfbf",
+    "image_name": "f7994ad8_images.jpg",
+    "original_caption": "a group of people standing next to each other .",
+    "corrected_caption": "a man and a woman standing next to each other",
+    "model": "MobileNetV3 + CLIP (WIP)",
+    "verified": null,
+    "verify_reason": null,
+    "timestamp": "2026-08-26T22:15:28.297167"
+  },
+  {
+    "id": "edef5798",
+    "image_name": "b3525896_images.jpg",
+    "original_caption": "a group of people standing next to each other .",
+    "corrected_caption": "a man and a woman standing next to each other",
+    "model": "MobileNetV3 + CLIP (WIP)",
+    "verified": null,
+    "verify_reason": null,
+    "timestamp": "2026-08-26T22:21:28.891334"
+  },
+  {
+    "id": "f74e84e6",
+    "image_name": "9693c04b_images.jpg",
+    "original_caption": "a group of people standing next to each other .",
+    "corrected_caption": "a man and a woman standing next to each other",
+    "model": "MobileNetV3 + CLIP (WIP)",
+    "verified": true,
+    "verify_reason": "The corrected caption is more accurate because it specifically identifies the subjects as a man and a woman instead of vaguely referring to two people as a 'group'.",
+    "timestamp": "2026-08-26T22:51:17.013390"
+  },
+  {
+    "id": "33f18bcb",
+    "image_name": "2668977c_image_2026-08-27_152738396.png",
+    "original_caption": "a cat is sitting on top of a couch .",
+    "corrected_caption": "a dog is sitting on top of a couch .",
+    "model": "MobileNetV3 + CLIP (WIP)",
+    "verified": true,
+    "verify_reason": "The animal in the image is a dog, not a cat.",
+    "timestamp": "2026-08-27T15:27:59.316779"
+  }
+]
