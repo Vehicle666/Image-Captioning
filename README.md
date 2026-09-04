@@ -93,14 +93,40 @@ pip install -r webapp/requirements.txt
 
 ## Chạy Web Application
 
+### Windows (PowerShell)
+
+```powershell
+# 1. Dừng Flask cũ (nếu có)
+Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue |
+    ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }
+Get-Process ngrok -ErrorAction SilentlyContinue | Stop-Process -Force
+Start-Sleep -Seconds 1
+
+# 2. Khởi động Flask
+Start-Process -FilePath ".venv\Scripts\python.exe" -ArgumentList "webapp\app.py" -WindowStyle Hidden
+
+# 3. Khởi động ngrok tunnel
+Start-Process -FilePath "E:\tools\ngrok\ngrok.exe" -ArgumentList "http 5000 --domain snowfall-idealize-uncombed.ngrok-free.dev" -WindowStyle Hidden
+
+# 4. Đợi web sẵn sàng
+Start-Sleep -Seconds 5
+Write-Host "Web: http://127.0.0.1:5000"
+Write-Host "Public: https://snowfall-idealize-uncombed.ngrok-free.dev"
+```
+
+### Hoặc chạy trực tiếp
+
 ```bash
 cd webapp
 python app.py
 ```
 
-Web chạy tại: **http://127.0.0.1:5000**
+### URLs
 
-Public URL (ngrok): **https://snowfall-idealize-uncombed.ngrok-free.dev**
+| URL | Mô tả |
+|-----|-------|
+| http://127.0.0.1:5000 | Local |
+| https://snowfall-idealize-uncombed.ngrok-free.dev | Public (ngrok) |
 
 ## Các mô hình có sẵn trên Web
 
