@@ -33,6 +33,12 @@ class BaseModel:
         """Free resources when model is switched away."""
         pass
 
+    def _ensure_loaded(self) -> None:
+        """Auto-load the model if it is not ready. Guards against stale/unloaded
+        instances so inference never hits a None model."""
+        if not self.is_loaded():
+            self.load()
+
     def get_caption(self, image_path: str) -> CaptionResult:
         """Generate a caption for the given image."""
         raise NotImplementedError

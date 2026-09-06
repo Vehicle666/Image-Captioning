@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Caption(Linh)</title>
+    <title>Image Captioning</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -328,12 +328,53 @@
             width: 100%;
         }
         footer a { color: #58a6ff; text-decoration: none; }
+
+        /* Side info columns (wide screens only) */
+        .side {
+            position: fixed;
+            top: 80px;
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .side-left { left: max(16px, calc(50% - 640px)); }
+        .side-right { right: max(16px, calc(50% - 640px)); }
+        .side-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 10px;
+            padding: 14px 16px;
+        }
+        .side-card .badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #8957e5;
+            border: 1px solid #8957e5;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+        .side-card h3 { font-size: 13px; color: #e6edf3; margin-bottom: 6px; }
+        .side-card p, .side-card li { font-size: 12px; color: #8b949e; line-height: 1.5; }
+        .side-card li { margin: 4px 0 0 14px; }
+        .side-card .num { color: #58a6ff; font-weight: 600; }
+        .side-card .hl { color: #3fb950; font-weight: 600; }
+        .space { height: 8px; }
+        @media (min-width: 1500px) {
+            .side { opacity: 1; pointer-events: auto; }
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="dot"></div>
-        <h1>Image Caption(Linh)</h1>
+        <h1>Image Captioning</h1>
     </header>
     <main>
         <!-- Model Selector -->
@@ -342,9 +383,11 @@
             <div class="model-list" id="model-list"></div>
             <div class="model-desc" id="model-desc"></div>
             <div class="model-loading" id="model-loading" style="display:none">Loading model...</div>
+            {% if show_finetune %}
             <button class="finetune-btn" id="finetune-btn">Fine-tune từ feedback</button>
             <div class="finetune-status" id="finetune-status"></div>
             <pre class="finetune-log" id="finetune-log"></pre>
+            {% endif %}
             <div class="fb-stats" id="fb-stats">Đang tải số liệu feedback...</div>
         </div>
 
@@ -377,8 +420,42 @@
             </div>
         </div>
     </main>
+    <aside class="side side-left">
+        <div class="side-card">
+            <span class="badge">Image Captioning</span>
+            <h3>AI mô tả ảnh</h3>
+            <p>Hệ thống tự động sinh ra <span class="hl">câu mô tả</span> cho bất kỳ bức ảnh nào bằng mô hình học sâu.</p>
+        </div>
+        <div class="side-card">
+            <h3>Cách hoạt động</h3>
+            <ul>
+                <li><span class="num">1.</span> CNN encoder (MobileNetV3 [+V3]) trích đặc trưng thị giác từ ảnh</li>
+                <li><span class="num">2.</span> Transformer decoder sinh từng chữ một</li>
+                <li><span class="num">3.</span> Beam search (beam=5) chọn câu tốt nhất</li>
+            </ul>
+        </div>
+        <div class="side-card">
+            <h3>Model trên trang</h3>
+            <p>• MobileNetV3 (+V3 +CLIP)<br>Ablation study: baseline → +V3 → +CLIP</p>
+        </div>
+    </aside>
+    <aside class="side side-right">
+        <div class="side-card">
+            <span class="badge">Bí quyết</span>
+            <h3>Ảnh càng rõ, caption càng chuẩn</h3>
+            <p>Ảnh sáng rõ, không mờ, chụp đúng chủ thể sẽ cho kết quả mô tả chính xác hơn.</p>
+        </div>
+        <div class="side-card">
+            <h3>Học có giám sát</h3>
+            <p>Dữ liệu COCO 2017 với <span class="num">27.521</span> ảnh và hàng chục nghìn caption được dùng để huấn luyện.</p>
+        </div>
+        <div class="side-card">
+            <h3>Fine-tune thông minh</h3>
+            <p>Caption sai? Người dùng sửa lại, model học dần từ phản hồi để ngày càng tốt hơn.</p>
+        </div>
+    </aside>
     <footer>
-        Image Caption(Linh) &mdash; Web App
+        Image Captioning &mdash; Web App
     </footer>
 
     <script>
@@ -596,8 +673,7 @@
             try {
                 const res = await fetch("/feedback");
                 const data = await safeJson(res);
-                fbStats.innerHTML = `Feedback: <b>${data.verified}</b> đã xác minh (Gemini) / ${data.total} tổng` +
-                    (data.verified > 0 ? " — sẵn sàng fine-tune" : " — chưa đủ để fine-tune");
+                fbStats.innerHTML = `Feedback: <b>${data.verified}</b> đã xác minh (Gemini) / ${data.total} tổng`;
             } catch {
                 fbStats.textContent = "Không tải được số liệu feedback.";
             }
@@ -606,6 +682,8 @@
         loadModels();
         loadFeedbackStats();
 
+        {% if show_finetune %}
+        const ADMIN_TOKEN = {{ admin_token | tojson }};
         // ── Fine-tune ──────────────────────────────────────────
         const finetuneBtn = document.getElementById("finetune-btn");
         const finetuneStatus = document.getElementById("finetune-status");
@@ -646,10 +724,16 @@
             try {
                 const res = await fetch("/finetune", {
                     method: "POST",
-                    headers: {"Content-Type": "application/json"},
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": ADMIN_TOKEN,
+                    },
                     body: JSON.stringify({epochs: 20, lr_mult: 0.5}),
                 });
                 const data = await safeJson(res);
+                if (res.status === 403) {
+                    throw new Error(data.error || "Không được phép");
+                }
                 pollTimer = setTimeout(pollFinetune, 2000);
             } catch (err) {
                 finetuneStatus.className = "finetune-status err";
@@ -657,6 +741,7 @@
                 finetuneBtn.disabled = false;
             }
         });
+        {% endif %}
     </script>
 </body>
 </html>

@@ -69,10 +69,19 @@ class ModelRegistry:
         if name not in self._models:
             raise ValueError(f"Unknown model: {name}. Available: {list(self._models.keys())}")
 
-        # Unload current
+        if name == self._active_name:
+            instance = self._instances.get(name)
+            if instance is None:
+                instance = self._models[name]()
+                instance.load()
+                self._instances[name] = instance
+            return instance
+
+        # Unload current and drop it so the next switch actually reloads it
         if self._active_name and self._active_name in self._instances:
             old = self._instances[self._active_name]
             old.unload()
+            del self._instances[self._active_name]
 
         # Load new
         if name not in self._instances:

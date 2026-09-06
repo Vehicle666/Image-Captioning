@@ -1,8 +1,9 @@
-"""MobileNetV3 + CLIP Transformer Captioning Model.
+"""MobileNetV3 (+V3 +CLIP) Supervised Captioning Model.
 
-Uses MobileNetV3-Small encoder with spatial attention,
-CLIP contrastive loss during training, and a Transformer decoder.
-Checkpoint: mobilenet_clip_captioning/checkpoints/model_best.pth
+Ablation-study encoder: 1 backbone (MobileNetV3-Small) by default,
+optionally fused with a second V3 backbone and CLIP contrastive loss
+(see src/config.py: BACKBONE / V3_BACKBONE / USE_V3 / USE_CLIP).
+Checkpoint: mobilenet_clip_captioning/checkpoints/<STUDY_TAG>/model_best.pth
 """
 
 import os
@@ -20,8 +21,8 @@ if _PROJECT_ROOT not in sys.path:
 
 
 class MobileNetCLIPModel(BaseModel):
-    name = "MobileNetV3 + CLIP (WIP)"
-    description = "MobileNetV3-Small encoder + Transformer decoder (576ch, 384d, 4 layers)"
+    name = "MobileNetV3 (+V3 +CLIP)"
+    description = "Supervised CNN encoder(s) + Transformer decoder (COCO). Toggle backbones via config."
 
     def __init__(self):
         self._model = None
@@ -29,12 +30,20 @@ class MobileNetCLIPModel(BaseModel):
         self._device = None
 
     def load(self):
-        from src.config import device, EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, NUM_HEADS, MODEL_BEST_PATH, MODEL_LATEST_PATH
+        from src.config import (
+            device, EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, NUM_HEADS,
+            ENCODER_BACKBONE, V3_ENCODER_BACKBONE, USE_V3_ENCODER, USE_CLIP,
+            MODEL_BEST_PATH, MODEL_LATEST_PATH,
+        )
         from src.model import CaptioningModel
         from src.vocabulary import CaptionTokenizer
 
         self._device = device
         self._tokenizer = CaptionTokenizer()
+
+        backbones = [ENCODER_BACKBONE]
+        if USE_V3_ENCODER:
+            backbones.append(V3_ENCODER_BACKBONE)
 
         checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
         self._model = CaptioningModel(
@@ -45,6 +54,8 @@ class MobileNetCLIPModel(BaseModel):
             num_layers=NUM_LAYERS,
             num_heads=NUM_HEADS,
             dropout=0.0,
+            backbones=tuple(backbones),
+            use_clip_proj=USE_CLIP,
         ).to(device)
         self._model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
         self._model.eval()
@@ -65,6 +76,7 @@ class MobileNetCLIPModel(BaseModel):
         from src.dataset import val_transform
         from src.generation import generate_caption_beam
 
+        self._ensure_loaded()
         image = Image.open(image_path).convert("RGB")
         image = val_transform(image).unsqueeze(0).to(self._device)
 

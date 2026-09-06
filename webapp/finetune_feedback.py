@@ -20,6 +20,7 @@ UPLOAD_FOLDER = os.path.join(WEBAPP_DIR, "uploads")
 
 from src.config import (
     EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, NUM_HEADS,
+    ENCODER_BACKBONE, V3_ENCODER_BACKBONE, USE_V3_ENCODER, USE_CLIP,
     MODEL_BEST_PATH, MODEL_LATEST_PATH, CHECKPOINT_DIR,
     GRAD_CLIP, LABEL_SMOOTHING,
 )
@@ -104,10 +105,14 @@ def finetune(epochs=20, lr_multiplier=0.5, batch_size=8):
     print(f"Tokenizer: {tokenizer.__class__.__name__}, vocab size: {len(tokenizer)}")
 
     checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
+    backbones = [ENCODER_BACKBONE]
+    if USE_V3_ENCODER:
+        backbones.append(V3_ENCODER_BACKBONE)
     model = CaptioningModel(
         embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE,
         vocab_size=len(tokenizer), pad_token_id=tokenizer.pad_token_id,
         num_layers=NUM_LAYERS, num_heads=NUM_HEADS, dropout=0.0,
+        backbones=tuple(backbones), use_clip_proj=USE_CLIP,
     ).to(device)
     model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
     print(f"Loaded model from {checkpoint}")
@@ -116,12 +121,7 @@ def finetune(epochs=20, lr_multiplier=0.5, batch_size=8):
     decoder_lr = 1e-4 * lr_multiplier
     print(f"Fine-tune LR: encoder={encoder_lr}, decoder={decoder_lr}")
 
-    encoder_params = (
-        list(model.encoder.features.parameters())
-        + list(model.encoder.attention.parameters())
-        + list(model.encoder.conv.parameters())
-        + list(model.encoder.bn.parameters())
-    )
+    encoder_params = [p for p in model.encoder.parameters() if p.requires_grad]
     decoder_params = list(model.decoder.parameters())
 
     optimizer = torch.optim.Adam([

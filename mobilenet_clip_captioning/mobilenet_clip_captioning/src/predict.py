@@ -8,7 +8,9 @@ from PIL import Image
 from src.config import (
     EMBED_SIZE, HIDDEN_SIZE,
     MODEL_BEST_PATH, MODEL_LATEST_PATH,
-    NUM_HEADS, NUM_LAYERS, device,
+    NUM_HEADS, NUM_LAYERS,
+    ENCODER_BACKBONE, V3_ENCODER_BACKBONE, USE_V3_ENCODER, USE_CLIP,
+    device,
 )
 from src.dataset import val_transform
 from src.generation import generate_caption, generate_caption_beam
@@ -23,10 +25,14 @@ def load_tokenizer():
 def load_model(tokenizer, checkpoint=None):
     if checkpoint is None:
         checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
+    backbones = [ENCODER_BACKBONE]
+    if USE_V3_ENCODER:
+        backbones.append(V3_ENCODER_BACKBONE)
     model = CaptioningModel(
         embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE,
         vocab_size=len(tokenizer), pad_token_id=tokenizer.pad_token_id,
         num_layers=NUM_LAYERS, num_heads=NUM_HEADS, dropout=0.0,
+        backbones=tuple(backbones), use_clip_proj=USE_CLIP,
     ).to(device)
     model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
     model.eval()

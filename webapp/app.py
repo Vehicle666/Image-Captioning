@@ -18,6 +18,14 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 FEEDBACK_FILE = os.path.join(BASE_DIR, "feedback.json")
 ALLOWED_EXT = {"jpg", "jpeg", "png", "bmp", "webp", "gif"}
 
+# Admin-only route + token for fine-tuning. Change FINETUNE_ADMIN_TOKEN in .env to keep it private.
+ADMIN_TOKEN = os.environ.get("FINETUNE_ADMIN_TOKEN", "ft-admin-9f3a2c1e95")
+ADMIN_HEADER = "X-Admin-Token"
+
+
+def _is_admin():
+    return request.headers.get(ADMIN_HEADER) == ADMIN_TOKEN
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
@@ -42,7 +50,12 @@ def allowed(filename):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", show_finetune=False)
+
+
+@app.route("/admin")
+def admin():
+    return render_template("index.html", show_finetune=True, admin_token=ADMIN_TOKEN)
 
 
 @app.route("/models", methods=["GET"])
@@ -200,6 +213,9 @@ def finetune_status():
 
 @app.route("/finetune", methods=["POST"])
 def finetune():
+    if not _is_admin():
+        return jsonify({"error": "Forbidden: admin-only"}), 403
+
     import subprocess
     import threading
 
@@ -252,7 +268,7 @@ def init():
     """Discover models and activate the fastest local one."""
     found = registry.discover()
     print(f"[webapp] Discovered {len(found)} model(s): {found}")
-    preferred = next((m for m in ["MobileNetV3 + CLIP (WIP)", "BLIP (Salesforce)"] if m in found), found[0] if found else None)
+    preferred = next((m for m in ["MobileNetV3 (+V3 +CLIP)", "MobileNetV3 + CLIP (WIP)"] if m in found), found[0] if found else None)
     if preferred:
         registry.switch_to(preferred)
         print(f"[webapp] Active model: {registry.get_active_name()}")
@@ -278,7 +294,7 @@ if __name__ == "__main__":
     init()
     ips = get_local_ips()
     print("=" * 50)
-    print("  Image Caption(Linh) Web App")
+    print("  Image Captioning Web App")
     print("=" * 50)
     for ip in ips:
         print(f"  Local:   http://{ip}:5000")

@@ -10,8 +10,24 @@ from src.config import (
     CLIP_EMBED_DIM,
     CLIP_TEXT_MODEL,
     CLIP_TEMPERATURE,
-    MOBILENET_OUT_CHANNELS,
 )
+
+
+# ── Backbone registry (all give a 7x7 spatial grid for 224x224 input) ──
+# name -> (builder, weights, out_channels, train_from)
+#   `train_from` = index in `features` from which parameters stay trainable
+#   (earlier blocks are frozen to keep the pretrained backbone stable).
+BACKBONE_REGISTRY = {
+    "mobilenet_v3_small": (
+        models.mobilenet_v3_small, models.MobileNet_V3_Small_Weights.DEFAULT, 576, 9,
+    ),
+    "mobilenet_v3_large": (
+        models.mobilenet_v3_large, models.MobileNet_V3_Large_Weights.DEFAULT, 960, 10,
+    ),
+    "efficientnet_b0": (
+        models.efficientnet_b0, models.EfficientNet_B0_Weights.DEFAULT, 1280, 6,
+    ),
+}
 
 
 # ── Positional Encoding ────────────────────────────────────────
@@ -46,43 +62,89 @@ class SpatialAttention(nn.Module):
         return x * attention
 
 
-# ── MobileNet Encoder ─────────────────────────────────────────
+# ── Single backbone branch ─────────────────────────────────────
 
-class MobileNetEncoder(nn.Module):
-    def __init__(self, embed_size, clip_embed_dim=CLIP_EMBED_DIM):
+class BackboneBranch(nn.Module):
+    def __init__(self, backbone_name, embed_size):
         super().__init__()
-        mobilenet = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
+        builder, weights, out_channels, train_from = BACKBONE_REGISTRY[backbone_name]
+        net = builder(weights=weights)
 
-        # Keep all layers except the classifier
-        self.features = mobilenet.features
+        self.features = net.features
+        self.out_channels = out_channels
+        self.backbone_name = backbone_name
 
-        # Freeze early layers (0-8), fine-tune late layers (9-12)
-        for i, param in enumerate(self.features.parameters()):
-            if i < 9:
-                param.requires_grad = False
+        for i, mod in enumerate(self.features):
+            if i < train_from:
+                for p in mod.parameters():
+                    p.requires_grad = False
 
         self.attention = SpatialAttention()
-        self.conv = nn.Conv2d(MOBILENET_OUT_CHANNELS, embed_size, kernel_size=1)
+        self.conv = nn.Conv2d(out_channels, embed_size, kernel_size=1)
         self.bn = nn.BatchNorm2d(embed_size)
 
-        # CLIP projection head (training only)
-        self.clip_proj = nn.Linear(MOBILENET_OUT_CHANNELS, clip_embed_dim)
+    def forward(self, images):
+        features = self.features(images)        # (B, C, 7, 7)
+        features = self.attention(features)     # (B, C, 7, 7)
+        pooled = torch.mean(features, dim=[2, 3])  # (B, C) for CLIP projection
+        features = self.bn(self.conv(features))    # (B, embed_size, 7, 7)
+        return features, pooled
+
+
+# ── Image Encoder (1 or more backbones) ────────────────────────
+
+class ImageEncoder(nn.Module):
+    """CNN encoder supporting an ablation-style feature fusion.
+
+    - 1 backbone            : MobileNet-only baseline
+    - 2 backbones (+V3)     : each branch 1x1-projects to embed_size, then the
+                              branches are concatenated along channels and fused
+                              back down to embed_size with a Conv1x1 + BN.
+    - clip_proj (optional)  : global-pooled branch features projected to the
+                              CLIP embedding space (contrastive loss, training only).
+    """
+
+    def __init__(self, embed_size, backbones=("mobilenet_v3_small",),
+                 clip_embed_dim=CLIP_EMBED_DIM, use_clip_proj=False):
+        super().__init__()
+        self.use_clip_proj = use_clip_proj
+        self.branches = nn.ModuleList(
+            [BackboneBranch(b, embed_size) for b in backbones]
+        )
+
+        self.fusion = None
+        if len(backbones) > 1:
+            self.fusion = nn.Sequential(
+                nn.Conv2d(embed_size * len(backbones), embed_size, kernel_size=1),
+                nn.BatchNorm2d(embed_size),
+            )
+
+        if use_clip_proj:
+            total_channels = sum(
+                BACKBONE_REGISTRY[b][2] for b in backbones
+            )
+            self.clip_proj = nn.Linear(total_channels, clip_embed_dim)
 
     def forward(self, images, return_clip_features=False):
-        features = self.features(images)           # (B, 576, 7, 7)
-        features = self.attention(features)         # (B, 576, 7, 7)
+        branch_outs, branch_pools = [], []
+        for branch in self.branches:
+            out, pooled = branch(images)
+            branch_outs.append(out)
+            branch_pools.append(pooled)
 
-        clip_features = None
+        if self.fusion is not None:
+            features = torch.cat(branch_outs, dim=1)   # (B, k*embed, 7, 7)
+            features = self.fusion(features)           # (B, embed, 7, 7)
+        else:
+            features = branch_outs[0]
+
+        features = features.permute(0, 2, 3, 1)                        # (B, 7, 7, embed)
+        features = features.reshape(features.size(0), -1, features.size(-1))  # (B, 49, embed)
+
         if return_clip_features:
-            pooled = torch.mean(features, dim=[2, 3])  # (B, 576)
-            clip_features = self.clip_proj(pooled)      # (B, 512)
-
-        features = self.conv(features)              # (B, embed_size, 7, 7)
-        features = self.bn(features)                # (B, embed_size, 7, 7)
-        features = features.permute(0, 2, 3, 1)    # (B, 7, 7, embed_size)
-        features = features.reshape(features.size(0), -1, features.size(-1))  # (B, 49, embed_size)
-
-        if return_clip_features:
+            if not self.use_clip_proj:
+                raise ValueError("use_clip_proj=False but CLIP features were requested")
+            clip_features = self.clip_proj(torch.cat(branch_pools, dim=1))  # (B, 512)
             return features, clip_features
         return features
 
@@ -269,9 +331,14 @@ class TransformerDecoder(nn.Module):
 
 class CaptioningModel(nn.Module):
     def __init__(self, embed_size, hidden_size, vocab_size, pad_token_id,
-                 num_layers=2, num_heads=4, dropout=0.1):
+                 num_layers=2, num_heads=4, dropout=0.1,
+                 backbones=None, use_clip_proj=False):
         super().__init__()
-        self.encoder = MobileNetEncoder(embed_size)
+        if backbones is None:
+            backbones = ("mobilenet_v3_small",)
+        self.encoder = ImageEncoder(
+            embed_size, backbones=backbones, use_clip_proj=use_clip_proj,
+        )
         self.decoder = TransformerDecoder(
             embed_size, hidden_size, vocab_size, pad_token_id,
             num_layers, num_heads, dropout,

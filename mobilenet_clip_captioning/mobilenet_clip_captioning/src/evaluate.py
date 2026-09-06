@@ -7,11 +7,15 @@ from tqdm import tqdm
 from src.config import (
     BATCH_SIZE,
     EMBED_SIZE,
+    ENCODER_BACKBONE,
     HIDDEN_SIZE,
     MODEL_BEST_PATH,
     MODEL_LATEST_PATH,
     NUM_HEADS,
     NUM_LAYERS,
+    USE_CLIP,
+    USE_V3_ENCODER,
+    V3_ENCODER_BACKBONE,
     VAL_IMAGES,
     device,
 )
@@ -58,12 +62,20 @@ def compute_caption_metrics(hypotheses_dict, references_dict):
     }
 
 
+def make_backbones():
+    backbones = [ENCODER_BACKBONE]
+    if USE_V3_ENCODER:
+        backbones.append(V3_ENCODER_BACKBONE)
+    return tuple(backbones)
+
+
 def load_model_for_eval(tokenizer):
     checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
     model = CaptioningModel(
         embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE,
         vocab_size=len(tokenizer), pad_token_id=tokenizer.pad_token_id,
         num_layers=NUM_LAYERS, num_heads=NUM_HEADS, dropout=0.0,
+        backbones=make_backbones(), use_clip_proj=USE_CLIP,
     ).to(device)
     model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
     model.eval()

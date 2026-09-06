@@ -1,37 +1,39 @@
-# MobileNet + CLIP Image Captioning
+# Ablation Study: MobileNet → +V3 → +CLIP (Image Captioning)
 
-Image captioning using MobileNetV3-Small encoder + TransformerDecoder with CLIP contrastive loss, trained on COCO 2017. Uses the CLIP subword BPE tokenizer (openai/clip-vit-base-patch32, 49,408 tokens + a dedicated `[PAD]` token = 49,409).
+Supervised image captioning on COCO 2017 with a **pluggable multi-backbone CNN encoder**. The repo is organized as an ablation study (application study): the exact same supervised pipeline is trained once per encoder config, then compared — answering *does adding a second V3 backbone / CLIP actually help?*
+
+## The 3 study configs
+
+| Config | Encoder(s) | CLIP loss | Research question |
+|--------|------------|-----------|-------------------|
+| **A** `baseline_mobilenet` | MobileNetV3-Small | off | Baseline |
+| **B** `mobilenet_v3` | MobileNetV3-Small **+ V3** (MobileNetV3-Large / EfficientNet) | off | Does a 2nd encoder help? |
+| **C** `mobilenet_v3_clip` | MobileNet + V3 | on | Does CLIP contrastive loss help further? |
+
+Every config writes its own checkpoints under `checkpoints/<STUDY_TAG>/` so nothing is overwritten.
 
 ## Architecture
 
 ```
 Image (3, 224, 224)
     |
-    v
-MobileNetV3-Small (pretrained, late layers fine-tuned)
-    |
-    v
-Spatial Attention -> Conv(576 -> 256) -> BatchNorm
-    |
-    +-> CLIP Projection Head (576 -> 512)  [training only]
-    |
-    v
-49 spatial tokens x 256 dims
-    |
-    v
-Transformer Decoder (2 layers, 4 heads)
-    |
-    v
-Caption tokens
+    +-> Backbone A: MobileNetV3-Small (pretrained, late layers fine-tuned) ----+
+    |                                                                          |
+    +-> Backbone B: MobileNetV3-Large / EfficientNet (optional, +V3) ---------+-> concat
+    |                                                                          |   -> Conv1x1 fusion
+    +-> CLIP Projection Head [only when USE_CLIP=1, training only]             |   -> BatchNorm
+    |                                                                          v
+    |                                                            49 spatial tokens x EMBED_SIZE
+    |                                                                          |
+    +-----------------------------------------------------------------------> Transformer Decoder
+                                                    Caption tokens -> Beam Search / Greedy
 ```
 
-**Training losses:**
-- Captioning loss (cross-entropy on token prediction) -- weight: 1.0
-- CLIP contrastive loss (aligns image + text embeddings) -- weight: 0.5
+Each backbone branch: `features -> SpatialAttention -> Conv1x1(embed_size) -> BatchNorm`.
 
-**Dataset:**
-- COCO 2017: 118k images with human-written ground-truth captions
-- Optional: BLIP pseudo-captions for CLIP text cache enrichment
+**Losses:**
+- Captioning cross-entropy + label smoothing — weight 1.0 (always on, supervised)
+- CLIP contrastive loss — weight 0.5 (only when `USE_CLIP=1`)
 
 ## Requirements
 
@@ -45,123 +47,82 @@ pandas, pillow, matplotlib, tqdm, nltk, pycocoevalcap, kagglehub
 ## Setup
 
 ```bash
-cd mobilenet_clip_captioning
+cd "E:\Image Captioning\mobilenet_clip_captioning\mobilenet_clip_captioning"
 pip install -r requirements.txt
 ```
 
-> **Note:** This project lives at `E:\Image Captioning\mobilenet_clip_captioning\mobilenet_clip_captioning`. Run all commands from that directory (the one containing `src/`), e.g.:
-> ```bat
-> cd "E:\Image Captioning\mobilenet_clip_captioning\mobilenet_clip_captioning"
-> ```
-
-## Quick Start
+## Quick start
 
 ```bash
-# 1. Download COCO 2017 dataset
+# 1. Download COCO 2017
 python -m src.main coco
 
-# 2. Train (default, ~5 min/epoch on GTX 1650)
-python -m src.main pipeline
+# 2. Train ALL study configs and compare (each in its own checkpoint folder)
+python -m src.main study
 
-# Optionally generate BLIP pseudo-captions first (~1-2h):
-python -m src.main pipeline --blip-captions
+# 3. Show comparison table of finished runs
+python -m src.main study-report
 ```
 
-## Full Commands
+Results are written to `checkpoints/study_results.json`.
+
+## Train a single config
 
 ```bash
-# Download COCO 2017 from Kaggle
-python -m src.main coco
+# Config A — baseline: MobileNet only, no CLIP
+set STUDY_TAG=baseline_mobilenet && set USE_V3=0 && set USE_CLIP=0 && python -m src.main train
 
-# Train only (same as pipeline, no BLIP generation)
-python -m src.main train
+# Config B — + V3 encoder branch (feature fusion)
+set STUDY_TAG=mobilenet_v3 && set USE_V3=1 && set USE_CLIP=0 && python -m src.main train
 
-# Generate BLIP pseudo-captions (optional, for CLIP text cache enrichment)
-python -m src.main soft-captions
-
-# Evaluate on validation set
-python -m src.main evaluate
-
-# Predict on any image
-python -m src.main predict path/to/image.jpg
-python -m src.main predict path/to/image.jpg --beam
-
-# Predict with a file dialog (pick the image in a folder window)
-python -m src.main predict
+# Config C — + V3 + CLIP contrastive loss
+set STUDY_TAG=mobilenet_v3_clip && set USE_V3=1 && set USE_CLIP=1 && python -m src.main train
 ```
 
-## Project Structure
+Or run from exercise of a single run:
+
+```bash
+python -m src.main evaluate            # BLEU/METEOR/CIDEr on COCO val set
+python -m src.main predict <image> --beam
+python -m src.main train --epochs 0    # train until early stop
+```
+
+## Ablation toggles (env vars, defaults in `src/config.py`)
+
+| Var | Default | Description |
+|-----|---------|-------------|
+| `BACKBONE` | `mobilenet_v3_small` | Primary backbone |
+| `V3_BACKBONE` | `mobilenet_v3_large` | Second (V3) backbone; `efficientnet_b0` also supported |
+| `USE_V3` | `1` | Enable 2nd encoder branch (feature fusion) |
+| `USE_CLIP` | `1` | Enable CLIP contrastive loss + projection head |
+| `STUDY_TAG` | (empty) | Checkpoint sub-folder name; empty = default config |
+
+## Project structure
 
 ```
 mobilenet_clip_captioning/
 |-- requirements.txt
-|-- README.md
 |-- src/
-|   |-- __init__.py        # Cache dirs, HF/disable warnings
-|   |-- config.py          # Hyperparameters, paths, tokenizer config
-|   |-- vocabulary.py      # CaptionTokenizer (CLIP tokenizer wrapper)
-|   |-- setup.py           # COCO download CLI
-|   |-- soft_caption.py    # BLIP caption generation (optional)
-|   |-- dataset.py         # COCO dataset + make_collate_fn
-|   |-- model.py           # MobileNetEncoder + TransformerDecoder + CLIPContrastiveLoss
-|   |-- train.py           # Training with per-epoch image resampling
-|   |-- evaluate.py        # BLEU/METEOR/CIDEr evaluation
-|   |-- predict.py         # Inference (greedy + beam search)
+|   |-- config.py          # Hyperparameters + ablation toggles (env-driven)
+|   |-- model.py           # ImageEncoder (multi-backbone fusion) + TransformerDecoder + CLIP
+|   |-- train.py           # Supervised training (AMP, early stopping, BLEU-4 checkpointing)
+|   |-- study.py           # Ablation runner + results table
+|   |-- dataset.py         # COCO dataset
+|   |-- evaluate.py        # BLEU/METEOR/CIDEr
+|   |-- predict.py         # Greedy + beam search inference
+|   |-- generation.py      # Decode logic
+|   |-- vocabulary.py      # CLIP subword tokenizer wrapper
 |   |-- main.py            # CLI entry point
+|   `-- setup.py           # COCO download
+`-- checkpoints/
+    |-- <STUDY_TAG>/       # per-config model_best.pth, training_log.txt, resume_state.pth
+    `-- study_results.json # ablation comparison table
 ```
 
-## Configuration
+## Study results
 
-All settings in `src/config.py`:
-
-### Model
-
-| Parameter | Default | Description |
-|---|---|---|
-| `EMBED_SIZE` | 384 | Decoder embedding dimension |
-| `HIDDEN_SIZE` | 768 | Transformer feed-forward dimension |
-| `NUM_LAYERS` | 4 | Transformer decoder layers |
-| `NUM_HEADS` | 6 | Attention heads |
-| `BEAM_SIZE` | 5 | Beam search width |
-
-### Training
-
-| Parameter | Default | Description |
-|---|---|---|
-| `BATCH_SIZE` | 16 | Training batch size |
-| `NUM_EPOCHS` | 200 | Max training epochs (early stopping may end sooner) |
-| `MAX_BATCHES_PER_EPOCH` | 0 | Batch limit per epoch (0 = unlimited) |
-| `TRAIN_IMAGES_PER_EPOCH` | 16000 | Unique images sampled per epoch |
-| `ENCODER_LR` | 1e-5 | Encoder learning rate |
-| `DECODER_LR` | 1e-4 | Decoder learning rate |
-| `WARMUP_EPOCHS` | 2 | Linear warmup epochs |
-| `CAPTION_LOSS_WEIGHT` | 1.0 | Captioning loss weight |
-| `CLIP_LOSS_WEIGHT` | 0.5 | CLIP contrastive loss weight |
-| `LABEL_SMOOTHING` | 0.1 | Label smoothing for caption CE loss |
-
-### Early Stopping
-
-| Parameter | Default | Description |
-|---|---|---|
-| `EARLY_STOP_PATIENCE` | 5 | Epochs to wait for val loss improvement |
-| `EARLY_STOP_MIN_DELTA` | 1e-4 | Minimum change to count as improvement |
-
-### Data & Tokenizer
-
-| Parameter | Default | Description |
-|---|---|---|
-| `TOKENIZER_MODEL` | openai/clip-vit-base-patch32 | CLIP subword BPE tokenizer (49,408 tokens) |
-| `BLIP_MODEL` | Salesforce/blip-image-captioning-base | BLIP model for soft captions (optional) |
-| `PSEUDO_CAPTION_BATCH_SIZE` | 16 | Batch size for BLIP inference |
-
-## Checkpoints
-
-Saved to `checkpoints/`:
-
-| File | Description |
-|---|---|---|
-| `model_best.pth` | Best model by BLEU-4 |
-| `model_latest.pth` | Latest epoch |
-| `resume_state.pth` | Full trainer state (optimizer, scheduler, scaler) |
-| `training_log.txt` | Training log with losses and metrics |
-| `pseudo_captions/coco_captions.json` | BLIP captions for COCO (optional) |
+| Config | BLEU-1 | BLEU-4 | METEOR | CIDEr |
+|--------|--------|--------|--------|-------|
+| A: MobileNet (baseline) | -- | -- | -- | -- |
+| B: + V3 | -- | -- | -- | -- |
+| C: + V3 + CLIP | -- | -- | -- | -- |

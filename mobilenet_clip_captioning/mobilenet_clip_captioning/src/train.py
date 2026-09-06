@@ -19,6 +19,7 @@ from src.config import (
     EARLY_STOP_MIN_DELTA,
     EARLY_STOP_PATIENCE,
     EMBED_SIZE,
+    ENCODER_BACKBONE,
     ENCODER_LR,
     DECODER_LR,
     GRAD_CLIP,
@@ -31,11 +32,14 @@ from src.config import (
     NUM_HEADS,
     NUM_LAYERS,
     NUM_WORKERS,
-    PSEUDO_CAPTIONS_DIR,
     RESUME_PATH,
     SCHEDULER_PATIENCE,
+    STUDY_TAG,
     TRAIN_IMAGES_PER_EPOCH,
     TRAINING_LOG_PATH,
+    USE_CLIP,
+    USE_V3_ENCODER,
+    V3_ENCODER_BACKBONE,
     VAL_BLEU_EVERY_N_EPOCHS,
     VAL_BLEU_SUBSET,
     VAL_EVERY_N_EPOCHS,
@@ -49,7 +53,7 @@ from src.dataset import (
     train_transform,
     val_transform,
 )
-from src.generation import generate_caption, generate_caption_beam
+from src.generation import generate_caption_beam
 from src.model import CaptioningModel, CLIPContrastiveLoss, CLIPTextCache
 from src.vocabulary import CaptionTokenizer
 
@@ -164,12 +168,33 @@ def plot_embedding_projection(model, val_loader, clip_cache, epoch, save_dir):
     plt.close()
 
 
+def make_backbones():
+    backbones = [ENCODER_BACKBONE]
+    if USE_V3_ENCODER:
+        backbones.append(V3_ENCODER_BACKBONE)
+    return tuple(backbones)
+
+
+def training_tag():
+    parts = [ENCODER_BACKBONE]
+    if USE_V3_ENCODER:
+        parts.append(f"+{V3_ENCODER_BACKBONE}")
+    if USE_CLIP:
+        parts.append("+CLIP")
+    tag = " ".join(parts)
+    return f"[{tag}]" if STUDY_TAG else tag
+
+
 def train(num_epochs=None):
     effective_epochs = num_epochs or NUM_EPOCHS
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
+    backbones = make_backbones()
+    clip_enabled = USE_CLIP
+
     print("=" * 60)
-    print("  Training: MobileNet + CLIP Image Captioning")
+    print(f"  Supervised Image Captioning - {training_tag()}")
+    print(f"  Backbones: {backbones} | CLIP loss: {clip_enabled}")
     print("=" * 60)
 
     # ── Load COCO captions (ground truth) ──────────────────────
@@ -185,15 +210,6 @@ def train(num_epochs=None):
     # ── Tokenizer ──────────────────────────────────────────────
     tokenizer = CaptionTokenizer()
     print(f"Tokenizer: {tokenizer.__class__.__name__}, vocab size: {len(tokenizer)}")
-
-    # ── Collect all captions for CLIP text cache ──────────────
-    all_captions = train_df["caption"].tolist() + val_df["caption"].tolist()
-
-    coco_soft_path = os.path.join(PSEUDO_CAPTIONS_DIR, "coco_captions.json")
-    if os.path.exists(coco_soft_path):
-        soft_caps = json.load(open(coco_soft_path))
-        all_captions.extend(soft_caps.values())
-        print(f"Added {len(soft_caps)} COCO soft captions for CLIP cache")
 
     # ── Build datasets ─────────────────────────────────────────
     all_train_images = train_df["image"].unique().tolist()
@@ -228,33 +244,31 @@ def train(num_epochs=None):
         embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE,
         vocab_size=len(tokenizer), pad_token_id=tokenizer.pad_token_id,
         num_layers=NUM_LAYERS, num_heads=NUM_HEADS, dropout=DROPOUT,
+        backbones=backbones, use_clip_proj=clip_enabled,
     ).to(device)
 
-    clip_loss_fn = CLIPContrastiveLoss().to(device)
+    clip_loss_fn = None
+    clip_cache = None
+    if clip_enabled:
+        clip_loss_fn = CLIPContrastiveLoss().to(device)
 
-    # ── Build CLIP text cache (persisted to disk) ─────────────
-    clip_cache = CLIPTextCache(device)
-    if os.path.exists(CLIP_CACHE_PATH):
-        clip_cache.load(CLIP_CACHE_PATH)
-    else:
-        unique_captions = list(set(all_captions))
-        clip_cache.build(unique_captions)
-        clip_cache.save(CLIP_CACHE_PATH)
-    missing = clip_cache.missing(all_captions)
-    if missing:
-        clip_cache.add(missing)
-        clip_cache.save(CLIP_CACHE_PATH)
-    del clip_cache.text_encoder
-    del clip_loss_fn.text_encoder, clip_loss_fn.tokenizer
-    torch.cuda.empty_cache()
+        # ── Build CLIP text cache (persisted to disk) ──────────
+        clip_cache = CLIPTextCache(device)
+        if os.path.exists(CLIP_CACHE_PATH):
+            clip_cache.load(CLIP_CACHE_PATH)
+        else:
+            unique_captions = list(set(train_df["caption"].tolist() + val_df["caption"].tolist()))
+            clip_cache.build(unique_captions)
+            clip_cache.save(CLIP_CACHE_PATH)
+        missing = clip_cache.missing(train_df["caption"].tolist() + val_df["caption"].tolist())
+        if missing:
+            clip_cache.add(missing)
+            clip_cache.save(CLIP_CACHE_PATH)
+        del clip_cache.text_encoder
+        del clip_loss_fn.text_encoder, clip_loss_fn.tokenizer
+        torch.cuda.empty_cache()
 
-    encoder_params = (
-        list(model.encoder.features.parameters())
-        + list(model.encoder.attention.parameters())
-        + list(model.encoder.conv.parameters())
-        + list(model.encoder.bn.parameters())
-        + list(model.encoder.clip_proj.parameters())
-    )
+    encoder_params = [p for p in model.encoder.parameters() if p.requires_grad]
     decoder_params = list(model.decoder.parameters())
 
     optimizer = torch.optim.Adam([
@@ -271,12 +285,14 @@ def train(num_epochs=None):
     log_file = open(TRAINING_LOG_PATH, "w")
     log_file.write("Training Log\n")
     log_file.write(f"Device: {device}\n")
+    log_file.write(f"Config: {training_tag()} (STUDY_TAG={STUDY_TAG or 'default'})\n")
     log_file.write(f"Tokenizer: {tokenizer.__class__.__name__} ({len(tokenizer)} tokens)\n")
     log_file.write(f"Epochs: {effective_epochs} | Batch: {BATCH_SIZE}\n")
     log_file.write(f"Embed: {EMBED_SIZE} | Hidden: {HIDDEN_SIZE} | Layers: {NUM_LAYERS} | Heads: {NUM_HEADS}\n")
     log_file.write(f"Encoder LR: {ENCODER_LR} | Decoder LR: {DECODER_LR}\n")
-    log_file.write(f"Caption loss weight: {CAPTION_LOSS_WEIGHT} | CLIP loss weight: {CLIP_LOSS_WEIGHT}\n")
-    log_file.write(f"CLIP text cache: {clip_cache.embeddings.shape[0]} entries\n")
+    log_file.write(f"Caption loss weight: {CAPTION_LOSS_WEIGHT} | CLIP loss weight: {CLIP_LOSS_WEIGHT if clip_enabled else 0}\n")
+    if clip_enabled:
+        log_file.write(f"CLIP text cache: {clip_cache.embeddings.shape[0]} entries\n")
     log_file.write(f"Training images: {len(train_loader.dataset)}\n")
     log_file.write("-" * 60 + "\n\n")
     log_file.flush()
@@ -334,7 +350,7 @@ def train(num_epochs=None):
 
             model.train()
             epoch_cap_loss = 0
-            epoch_clip_loss = 0
+            epoch_clip_loss = 0.0
 
             warmup_factor = min(1.0, (epoch + 1) / WARMUP_EPOCHS) if epoch < WARMUP_EPOCHS else 1.0
             optimizer.param_groups[0]["lr"] = ENCODER_LR * warmup_factor
@@ -351,14 +367,21 @@ def train(num_epochs=None):
                 optimizer.zero_grad()
 
                 with autocast("cuda", enabled=torch.cuda.is_available()):
-                    outputs, clip_features = model(images, captions, return_clip_features=True)
+                    if clip_enabled:
+                        outputs, clip_features = model(images, captions, return_clip_features=True)
+                    else:
+                        outputs = model(images, captions)
+                        clip_features = None
 
                     cap_loss = caption_criterion(
                         outputs.reshape(-1, len(tokenizer)),
                         captions[:, 1:].reshape(-1),
                     )
-                    closs = clip_loss_fn(clip_features, captions, text_cache=clip_cache, caption_strings=texts)
-                    total_loss = CAPTION_LOSS_WEIGHT * cap_loss + CLIP_LOSS_WEIGHT * closs
+                    if clip_enabled:
+                        closs = clip_loss_fn(clip_features, captions, text_cache=clip_cache, caption_strings=texts)
+                        total_loss = CAPTION_LOSS_WEIGHT * cap_loss + CLIP_LOSS_WEIGHT * closs
+                    else:
+                        total_loss = CAPTION_LOSS_WEIGHT * cap_loss
 
                 if not torch.isfinite(total_loss):
                     optimizer.zero_grad(set_to_none=True)
@@ -372,8 +395,9 @@ def train(num_epochs=None):
                 scaler.update()
 
                 epoch_cap_loss += cap_loss.item()
-                epoch_clip_loss += closs.item()
-                progress.set_postfix(cap=cap_loss.item(), clip=closs.item())
+                if clip_enabled:
+                    epoch_clip_loss += closs.item()
+                progress.set_postfix(cap=cap_loss.item(), clip=closs.item() if clip_enabled else 0.0)
 
                 if batch_count % 100 == 0:
                     torch.cuda.empty_cache()
@@ -407,11 +431,12 @@ def train(num_epochs=None):
                         outputs = model(images, captions)
                         val_loss += caption_criterion(outputs.reshape(-1, len(tokenizer)), captions[:, 1:].reshape(-1)).item()
                 avg_val = val_loss / max(1, len(val_loader))
-                emb_dir = os.path.join(CHECKPOINT_DIR, "embeddings")
-                try:
-                    plot_embedding_projection(model, val_loader, clip_cache, epoch + 1, emb_dir)
-                except Exception as e:
-                    print(f"[warn] Embedding plot failed (epoch {epoch+1}): {e}")
+                if clip_enabled:
+                    emb_dir = os.path.join(CHECKPOINT_DIR, "embeddings")
+                    try:
+                        plot_embedding_projection(model, val_loader, clip_cache, epoch + 1, emb_dir)
+                    except Exception as e:
+                        print(f"[warn] Embedding plot failed (epoch {epoch+1}): {e}")
             else:
                 avg_val = float("inf")
             if run_val:
@@ -423,7 +448,9 @@ def train(num_epochs=None):
             elif run_val:
                 patience_counter += 1
 
-            line = f"Epoch {epoch+1}: CapLoss={avg_cap:.4f} | CLIP={avg_clip:.4f}"
+            line = f"Epoch {epoch+1}: CapLoss={avg_cap:.4f}"
+            if clip_enabled:
+                line += f" | CLIP={avg_clip:.4f}"
             if run_val:
                 line += f" | ValLoss={avg_val:.4f}"
 
