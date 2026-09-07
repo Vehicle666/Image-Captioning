@@ -99,6 +99,43 @@ set STUDY_TAG=mobilenet_v3 && set USE_V3=1 && set USE_CLIP=0 && python -m src.ma
 set STUDY_TAG=mobilenet_v3_clip && set USE_V3=1 && set USE_CLIP=1 && python -m src.main train
 ```
 
+### Train config A bằng venv (máy này)
+
+```powershell
+# Kích hoạt venv (nếu chưa)
+& "E:\Image Captioning\.venv\Scripts\Activate.ps1"
+
+# Vào thư mục project captioning
+cd "E:\Image Captioning\mobilenet_clip_captioning\mobilenet_clip_captioning"
+
+# Chạy config A: baseline_mobilenet (600 epochs)
+$env:STUDY_TAG="baseline_mobilenet"; $env:USE_V3="0"; $env:USE_CLIP="0"; python -m src.main train
+```
+
+Nếu chạy từ **cmd.exe** thay vì PowerShell:
+
+```cmd
+cd E:\Image Captioning\mobilenet_clip_captioning\mobilenet_clip_captioning
+set STUDY_TAG=baseline_mobilenet && set USE_V3=0 && set USE_CLIP=0 && python -m src.main train
+```
+
+> Nếu bị ngắt giữa chừng, chạy lại **cùng lệnh** để resume từ `resume_state.pth`.
+> Log theo dõi ở `checkpoints/baseline_mobilenet/training_log.txt`.
+
+### Chia việc train với bạn (B & C trên máy khác)
+
+Máy này train **Config A**. Bạn của bạn train **Config B & C** với đúng thông số dưới đây (giống hệt `src/study.py`):
+
+| Config | `STUDY_TAG` | `BACKBONE` | `V3_BACKBONE` | `USE_V3` | `USE_CLIP` | Lệnh (cmd) |
+|--------|-------------|------------|-----------------|----------|-----------|------------|
+| **B** | `mobilenet_v3` | `mobilenet_v3_small` | `mobilenet_v3_large` | `1` | `0` | `set STUDY_TAG=mobilenet_v3 && set USE_V3=1 && set USE_CLIP=0 && python -m src.main train` |
+| **C** | `mobilenet_v3_clip` | `mobilenet_v3_small` | `mobilenet_v3_large` | `1` | `1` | `set STUDY_TAG=mobilenet_v3_clip && set USE_V3=1 && set USE_CLIP=1 && python -m src.main train` |
+
+Lưu ý cho bạn train B/C:
+- Dataset COCO 2017 phải nằm đúng đường dẫn trong `src/config.py` (`DATASET_DIR`) hoặc sửa cho khớp máy của bạn.
+- Sau khi train xong, gửi lại thư mục `checkpoints/mobilenet_v3/` và `checkpoints/mobilenet_v3_clip/` (hoặc cả 2 tệp `model_best.pth`/`model_latest.pth` + file `training_log.txt`) để gộp vào bảng ablation.
+- Kết quả của cả 3 config sẽ được gom vào `checkpoints/study_results.json` khi gộp dữ liệu.
+
 **Ablation toggles** (đọc từ biến môi trường, có default trong `src/config.py`):
 
 | Env | Default | Mô tả |

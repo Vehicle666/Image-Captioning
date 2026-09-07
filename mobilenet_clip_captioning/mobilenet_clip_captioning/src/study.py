@@ -42,7 +42,8 @@ CONFIGS = [
 ]
 
 _BLEU_LINE_RE = re.compile(
-    r"B1=(?P<b1>[0-9.]+)\s+B4=(?P<b4>[0-9.]+)(?:\s+M=(?P<meteor>[0-9.]+))?\s+C=(?P<cider>[0-9.]+)"
+    r"B1=(?P<b1>[0-9.]+)\s+B4=(?P<b4>[0-9.]+)"
+    r"(?:\s+M=(?P<meteor>[0-9.]+))?(?:\s+C=(?P<cider>[0-9.]+))?"
 )
 _COMPLETE_RE = re.compile(r"Training complete\. Best BLEU-4:\s*(?P<b4>[0-9.]+)")
 
@@ -76,7 +77,8 @@ def summary_for(tag):
         result["bleu4"] = float(best_line.group("b4"))
         if best_line.group("meteor"):
             result["meteor"] = float(best_line.group("meteor"))
-        result["cider"] = float(best_line.group("cider"))
+        if best_line.group("cider"):
+            result["cider"] = float(best_line.group("cider"))
         epoch_match = re.match(r"Epoch (\d+)", best_epoch)
         if epoch_match:
             result["epochs"] = int(epoch_match.group(1))

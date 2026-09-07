@@ -31,34 +31,26 @@ class MobileNetCLIPModel(BaseModel):
 
     def load(self):
         from src.config import (
-            device, EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, NUM_HEADS,
-            ENCODER_BACKBONE, V3_ENCODER_BACKBONE, USE_V3_ENCODER, USE_CLIP,
-            MODEL_BEST_PATH, MODEL_LATEST_PATH,
+            device, MODEL_BEST_PATH, MODEL_LATEST_PATH,
         )
-        from src.model import CaptioningModel
+        from src.model import build_model_from_checkpoint
         from src.vocabulary import CaptionTokenizer
+
+        import src.config as cfg
 
         self._device = device
         self._tokenizer = CaptionTokenizer()
 
-        backbones = [ENCODER_BACKBONE]
-        if USE_V3_ENCODER:
-            backbones.append(V3_ENCODER_BACKBONE)
-
         checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
-        self._model = CaptioningModel(
-            embed_size=EMBED_SIZE,
-            hidden_size=HIDDEN_SIZE,
-            vocab_size=len(self._tokenizer),
-            pad_token_id=self._tokenizer.pad_token_id,
-            num_layers=NUM_LAYERS,
-            num_heads=NUM_HEADS,
-            dropout=0.0,
-            backbones=tuple(backbones),
-            use_clip_proj=USE_CLIP,
-        ).to(device)
-        self._model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
-        self._model.eval()
+        if not os.path.exists(checkpoint):
+            raise FileNotFoundError(
+                f"No trained model found for this config. "
+                f"Looking in {cfg.CHECKPOINT_DIR} ({MODEL_BEST_PATH} / {MODEL_LATEST_PATH}).\n"
+                "Train first via `python -m src.main study` (or `train`), then restart the web app."
+            )
+        self._model = build_model_from_checkpoint(
+            checkpoint, self._tokenizer, device=device,
+        )
 
     def unload(self):
         if self._model is not None:

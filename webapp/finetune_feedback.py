@@ -19,8 +19,6 @@ FEEDBACK_FILE = os.path.join(WEBAPP_DIR, "feedback.json")
 UPLOAD_FOLDER = os.path.join(WEBAPP_DIR, "uploads")
 
 from src.config import (
-    EMBED_SIZE, HIDDEN_SIZE, NUM_LAYERS, NUM_HEADS,
-    ENCODER_BACKBONE, V3_ENCODER_BACKBONE, USE_V3_ENCODER, USE_CLIP,
     MODEL_BEST_PATH, MODEL_LATEST_PATH, CHECKPOINT_DIR,
     GRAD_CLIP, LABEL_SMOOTHING,
 )
@@ -81,7 +79,7 @@ def load_verified_feedback():
 
 def finetune(epochs=20, lr_multiplier=0.5, batch_size=8):
     from src.config import device
-    from src.model import CaptioningModel
+    from src.model import build_model_from_checkpoint
     from src.vocabulary import CaptionTokenizer
 
     verified = load_verified_feedback()
@@ -105,16 +103,13 @@ def finetune(epochs=20, lr_multiplier=0.5, batch_size=8):
     print(f"Tokenizer: {tokenizer.__class__.__name__}, vocab size: {len(tokenizer)}")
 
     checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
-    backbones = [ENCODER_BACKBONE]
-    if USE_V3_ENCODER:
-        backbones.append(V3_ENCODER_BACKBONE)
-    model = CaptioningModel(
-        embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE,
-        vocab_size=len(tokenizer), pad_token_id=tokenizer.pad_token_id,
-        num_layers=NUM_LAYERS, num_heads=NUM_HEADS, dropout=0.0,
-        backbones=tuple(backbones), use_clip_proj=USE_CLIP,
-    ).to(device)
-    model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
+    if not os.path.exists(checkpoint):
+        raise FileNotFoundError(
+            f"No trained model found in {CHECKPOINT_DIR} "
+            f"(tried {MODEL_BEST_PATH} / {MODEL_LATEST_PATH}). Train first."
+        )
+    model = build_model_from_checkpoint(checkpoint, tokenizer, device=device)
+    model.train()
     print(f"Loaded model from {checkpoint}")
 
     encoder_lr = 1e-5 * lr_multiplier
@@ -141,7 +136,7 @@ def finetune(epochs=20, lr_multiplier=0.5, batch_size=8):
     )
 
     print(f"\nFine-tuning for {epochs} epochs on {len(ds)} samples...")
-    model.train()
+    total_loss = 0
     for epoch in range(epochs):
         total_loss = 0
         for images, captions, texts in loader:

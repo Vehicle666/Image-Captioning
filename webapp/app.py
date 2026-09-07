@@ -74,6 +74,8 @@ def switch_model():
         return jsonify({"ok": True, "active": model.name})
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
+    except Exception as e:
+        return jsonify({"error": f"Failed to load model '{name}': {e}"}), 500
 
 
 @app.route("/caption", methods=["POST"])
@@ -270,8 +272,12 @@ def init():
     print(f"[webapp] Discovered {len(found)} model(s): {found}")
     preferred = next((m for m in ["MobileNetV3 (+V3 +CLIP)", "MobileNetV3 + CLIP (WIP)"] if m in found), found[0] if found else None)
     if preferred:
-        registry.switch_to(preferred)
-        print(f"[webapp] Active model: {registry.get_active_name()}")
+        try:
+            registry.switch_to(preferred)
+            print(f"[webapp] Active model: {registry.get_active_name()}")
+        except Exception as e:
+            print(f"[webapp] Could NOT load '{preferred}': {e}")
+            print("[webapp] The web interface will still start; select a trained model from the UI.")
 
 
 if __name__ == "__main__":

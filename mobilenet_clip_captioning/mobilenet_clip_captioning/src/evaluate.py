@@ -6,22 +6,14 @@ from tqdm import tqdm
 
 from src.config import (
     BATCH_SIZE,
-    EMBED_SIZE,
-    ENCODER_BACKBONE,
-    HIDDEN_SIZE,
     MODEL_BEST_PATH,
     MODEL_LATEST_PATH,
-    NUM_HEADS,
-    NUM_LAYERS,
-    USE_CLIP,
-    USE_V3_ENCODER,
-    V3_ENCODER_BACKBONE,
     VAL_IMAGES,
     device,
 )
 from src.dataset import COCODataset, make_collate_fn, get_coco_captions, val_transform
 from src.generation import generate_caption, generate_caption_beam
-from src.model import CaptioningModel
+from src.model import build_model_from_checkpoint
 from src.vocabulary import CaptionTokenizer
 
 torch.set_num_threads(min(16, os.cpu_count() or 8))
@@ -62,24 +54,14 @@ def compute_caption_metrics(hypotheses_dict, references_dict):
     }
 
 
-def make_backbones():
-    backbones = [ENCODER_BACKBONE]
-    if USE_V3_ENCODER:
-        backbones.append(V3_ENCODER_BACKBONE)
-    return tuple(backbones)
-
-
 def load_model_for_eval(tokenizer):
     checkpoint = MODEL_BEST_PATH if os.path.exists(MODEL_BEST_PATH) else MODEL_LATEST_PATH
-    model = CaptioningModel(
-        embed_size=EMBED_SIZE, hidden_size=HIDDEN_SIZE,
-        vocab_size=len(tokenizer), pad_token_id=tokenizer.pad_token_id,
-        num_layers=NUM_LAYERS, num_heads=NUM_HEADS, dropout=0.0,
-        backbones=make_backbones(), use_clip_proj=USE_CLIP,
-    ).to(device)
-    model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
-    model.eval()
-    return model
+    if not os.path.exists(checkpoint):
+        raise FileNotFoundError(
+            f"No checkpoint found in checkpoints/ (tried {MODEL_BEST_PATH}, {MODEL_LATEST_PATH}).\n"
+            "Train a model first (study/study-report), or set STUDY_TAG to the config you want."
+        )
+    return build_model_from_checkpoint(checkpoint, tokenizer, device=device)
 
 
 @torch.no_grad()
@@ -119,7 +101,10 @@ def evaluate(beam=True):
     print(f"  BLEU-4:  {metrics['bleu4']:.4f}")
     if metrics["meteor"] is not None:
         print(f"  METEOR:  {metrics['meteor']:.4f}")
-    print(f"  CIDEr:   {metrics['cider']:.4f}")
+    if metrics["cider"] is not None:
+        print(f"  CIDEr:   {metrics['cider']:.4f}")
+    else:
+        print("  CIDEr:   unavailable (pycocoevalcap missing)")
     print("=" * 50)
 
     import random

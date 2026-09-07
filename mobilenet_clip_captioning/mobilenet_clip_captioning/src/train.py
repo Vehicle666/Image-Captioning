@@ -319,6 +319,14 @@ def train(num_epochs=None):
                 f"(e.g. {bad_tensors[:3]}). Refusing to resume from a corrupted "
                 f"checkpoint. Restore weights from {MODEL_BEST_PATH} instead."
             )
+        ckpt_arch = ckpt.get("arch")
+        if ckpt_arch and ckpt_arch != training_tag():
+            raise RuntimeError(
+                f"Resume checkpoint was trained with architecture '{ckpt_arch}' "
+                f"but the current config uses '{training_tag()}'. This would corrupt "
+                f"training; set STUDY_TAG/USE_V3/USE_CLIP/BACKBONE to match, or move "
+                f"this resume_state.pth away to start fresh."
+            )
         model.load_state_dict(ckpt["model"])
         ckpt_groups = len(ckpt["optimizer"]["param_groups"])
         if ckpt_groups == len(optimizer.param_groups):
@@ -479,7 +487,8 @@ def train(num_epochs=None):
                 line += f" | B1={metrics['bleu1']:.4f} B4={metrics['bleu4']:.4f}"
                 if metrics["meteor"] is not None:
                     line += f" M={metrics['meteor']:.4f}"
-                line += f" C={metrics['cider']:.4f}"
+                if metrics["cider"] is not None:
+                    line += f" C={metrics['cider']:.4f}"
 
                 if metrics["bleu4"] > best_bleu4:
                     best_bleu4 = metrics["bleu4"]
@@ -494,6 +503,7 @@ def train(num_epochs=None):
             tmp = RESUME_PATH + ".tmp"
             torch.save({
                 "epoch": epoch,
+                "arch": training_tag(),
                 "model": model.state_dict(),
                 "optimizer": optimizer.state_dict(),
                 "scheduler": scheduler.state_dict(),
@@ -521,6 +531,7 @@ def train(num_epochs=None):
         tmp = RESUME_PATH + ".tmp"
         torch.save({
             "epoch": epoch,
+            "arch": training_tag(),
             "model": model.state_dict(),
             "optimizer": optimizer.state_dict(),
             "scheduler": scheduler.state_dict(),

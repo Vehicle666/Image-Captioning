@@ -1,4 +1,5 @@
 import math
+import os
 
 import torch
 import torch.nn as nn
@@ -356,3 +357,79 @@ class CaptioningModel(nn.Module):
         if return_clip_features:
             return outputs, clip_features
         return outputs
+
+
+# ── Building a model that exactly matches a saved checkpoint ───
+# The ablation study changes the encoder architecture per config
+# (backbones list, CLIP head). Instead of guessing from env vars,
+# inspect the checkpoint's state dict so `load` can never be built
+# with a mismatched architecture (a recurring source of errors).
+
+def build_model_from_checkpoint(checkpoint, tokenizer, device=None,
+                                dropout=0.0, num_layers=None, num_heads=None,
+                                backbones=None, use_clip_proj=None,
+                                hidden_size=None):
+    """Build a CaptioningModel whose architecture matches `checkpoint`.
+
+    Backbones / CLIP head / embed size are detected from the state dict
+    keys; num_layers / num_heads / hidden_size come from config (fallback
+    to explicit args). Raises FileNotFoundError if the checkpoint is missing
+    and RuntimeError if the checkpoint is unusable.
+    """
+    from src.config import EMBED_SIZE, HIDDEN_SIZE, NUM_HEADS, NUM_LAYERS, device as _default_device
+
+    if not os.path.exists(checkpoint):
+        raise FileNotFoundError(
+            f"Checkpoint not found: {checkpoint}\n"
+            "Train a model first (python -m src.main study), or point STUDY_TAG "
+            "at the config you want to run."
+        )
+
+    device = device or _default_device
+    state = torch.load(checkpoint, map_location="cpu", weights_only=True)
+
+    # ── Detect encoder architecture from the checkpoint ─────────
+    detected_backbones = []
+    i = 0
+    while True:
+        key = f"encoder.branches.{i}.conv.weight"
+        if key not in state:
+            break
+        out_channels = state[key].shape[1]
+        name = next(
+            (n for n, (_, _, c, _) in BACKBONE_REGISTRY.items() if c == out_channels),
+            None,
+        )
+        if name is None:
+            raise RuntimeError(
+                f"Cannot identify backbone for branch {i} ({out_channels} channels) "
+                f"in {checkpoint}. Known backbones: {list(BACKBONE_REGISTRY)}"
+            )
+        detected_backbones.append(name)
+        i += 1
+
+    if i > 0:
+        backbones = tuple(detected_backbones)
+        embed_size = state["encoder.branches.0.conv.weight"].shape[0]
+    else:
+        backbones = backbones or ("mobilenet_v3_small",)
+        embed_size = EMBED_SIZE
+
+    if use_clip_proj is None:
+        use_clip_proj = "encoder.clip_proj.weight" in state
+
+    model = CaptioningModel(
+        embed_size=embed_size,
+        hidden_size=hidden_size or HIDDEN_SIZE,
+        vocab_size=len(tokenizer),
+        pad_token_id=tokenizer.pad_token_id,
+        num_layers=num_layers or NUM_LAYERS,
+        num_heads=num_heads or NUM_HEADS,
+        dropout=dropout,
+        backbones=backbones,
+        use_clip_proj=use_clip_proj,
+    )
+    model.load_state_dict(state)
+    model.to(device)
+    model.eval()
+    return model
