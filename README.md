@@ -146,6 +146,11 @@ Lưu ý cho bạn train B/C:
 | `USE_CLIP` | `1` | Bật CLIP contrastive loss + projection head |
 | `STUDY_TAG` | (trống) | Tên thư mục checkpoint; để trống = default config |
 
+**K-fold fold rotation** (không còn lấy mẫu ngẫu nhiên mỗi epoch):
+- `K_FOLD` (default `20`): toàn bộ train2017 được chia MỘT LẦN thành `K_FOLD` fold cố định (sắp xếp theo tên file, xen kẽ). Epoch `e` train trên fold `(e % K_FOLD)`. Sau `K_FOLD` epoch, toàn bộ dataset được thấy đúng một lần — loại bỏ variance do `random.sample` mỗi epoch gây ra.
+- `SEED` (default `42`): gieo seed cho random/numpy/torch và subset BLEU val, đảm bảo kết quả tái lập được giữa các config trong ablation.
+- Thay đổi trực tiếp trong `src/config.py` (không phải biến môi trường).
+
 ## Web API
 
 | Endpoint | Phương thức | Mô tả |

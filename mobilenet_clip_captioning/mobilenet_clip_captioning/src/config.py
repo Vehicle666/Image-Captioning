@@ -1,10 +1,15 @@
 import os
 import torch
 
+os.environ["HF_HOME"] = "D:/AI_Cache/huggingface"
+os.environ["HF_HUB_CACHE"] = "D:/AI_Cache/huggingface/hub"
+os.environ["TORCH_HOME"] = "D:/AI_Cache/torch"
+os.environ["KAGGLE_CACHE_DIR"] = "D:/AI_Cache/kagglehub"
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ── Dataset paths ──────────────────────────────────────────────
-DATASET_DIR = "E:/Image Captioning/coco_dataset/coco2017"
+DATASET_DIR = "D:/coco_dataset/coco2017"
 TRAIN_IMAGES = os.path.join(DATASET_DIR, "train2017")
 VAL_IMAGES = os.path.join(DATASET_DIR, "val2017")
 TRAIN_ANN = os.path.join(DATASET_DIR, "annotations", "captions_train2017.json")
@@ -49,8 +54,20 @@ CLIP_EMBED_DIM = 512
 # ── Training ───────────────────────────────────────────────────
 NUM_EPOCHS = 600
 BATCH_SIZE = 16
-MAX_BATCHES_PER_EPOCH = 0     # 0 = unlimited (use TRAIN_IMAGES_PER_EPOCH instead)
-TRAIN_IMAGES_PER_EPOCH = 5500   # unique images per epoch (tuned to ~10 min on GTX 1650)
+MAX_BATCHES_PER_EPOCH = 0     # 0 = unlimited
+
+# ── K-fold fold rotation ───────────────────────────────────────
+# The original code sampled a random subset of images every epoch, so each
+# epoch used a different, overlapping slice of train2017 and results varied a
+# lot between runs. Instead, train2017 is split ONCE into K_FOLD deterministic
+# folds (sorted by filename, interleaved). Epoch e trains on fold (e % K_FOLD);
+# over K epochs the entire dataset is seen exactly once, in a fixed order.
+# This keeps every config in the ablation study on the identical data schedule
+# and makes runs reproducible (SEED) while staying near the old per-epoch
+# budget (~5.5k imgs/epoch; train2017 has ~118k images, so ~20 folds fit).
+K_FOLD = 20
+SEED = 42
+
 ENCODER_LR = 1e-5
 DECODER_LR = 1e-4
 WARMUP_EPOCHS = 6

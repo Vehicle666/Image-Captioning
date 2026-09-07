@@ -24,6 +24,7 @@ from src.config import (
     DECODER_LR,
     GRAD_CLIP,
     HIDDEN_SIZE,
+    K_FOLD,
     LABEL_SMOOTHING,
     MAX_BATCHES_PER_EPOCH,
     MODEL_BEST_PATH,
@@ -34,8 +35,8 @@ from src.config import (
     NUM_WORKERS,
     RESUME_PATH,
     SCHEDULER_PATIENCE,
+    SEED,
     STUDY_TAG,
-    TRAIN_IMAGES_PER_EPOCH,
     TRAINING_LOG_PATH,
     USE_CLIP,
     USE_V3_ENCODER,
@@ -175,6 +176,28 @@ def make_backbones():
     return tuple(backbones)
 
 
+def build_k_folds(images, k=K_FOLD):
+    """Split train images into k deterministic, roughly equal folds.
+
+    Sorted interleaved assignment: image[i] -> fold(i % k). Stable across
+    runs/machines because it depends only on filenames, not on RNG state.
+    Returns a list of folds (lists of image filenames).
+    """
+    ordered = sorted(images)
+    folds = [[] for _ in range(k)]
+    for idx, img in enumerate(ordered):
+        folds[idx % k].append(img)
+    return folds
+
+
+def set_reproducible_seed(seed=SEED):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+
 def training_tag():
     parts = [ENCODER_BACKBONE]
     if USE_V3_ENCODER:
@@ -187,6 +210,7 @@ def training_tag():
 
 def train(num_epochs=None):
     effective_epochs = num_epochs or NUM_EPOCHS
+    set_reproducible_seed(SEED)
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 
     backbones = make_backbones()
@@ -215,23 +239,28 @@ def train(num_epochs=None):
     all_train_images = train_df["image"].unique().tolist()
     collate = make_collate_fn(tokenizer.pad_token_id)
 
+    # K-fold fold rotation: split ALL train images into K deterministic folds.
+    # Epoch e uses fold (e % K), so every epoch covers a disjoint fixed slice
+    # and the whole dataset cycles exactly once per K epochs. No random
+    # subsampling -> run-to-run variance is eliminated.
+    k_folds = build_k_folds(all_train_images, K_FOLD)
+    fold_sizes = [len(f) for f in k_folds]
+    print(f"K-fold: {len(k_folds)} folds (sizes {fold_sizes[0]}..{fold_sizes[-1]}, total {sum(fold_sizes)})")
+
     length_cache_path = os.path.join(CHECKPOINT_DIR, "caption_token_lens.json")
     caption_lens = get_caption_token_lens(train_df["caption"].tolist(), tokenizer, length_cache_path)
 
-    def make_train_loader():
-        if TRAIN_IMAGES_PER_EPOCH > 0 and TRAIN_IMAGES_PER_EPOCH < len(all_train_images):
-            subset = random.sample(all_train_images, TRAIN_IMAGES_PER_EPOCH)
-            subset_df = train_df[train_df["image"].isin(subset)].reset_index(drop=True)
-        else:
-            subset_df = train_df
+    def make_train_loader(fold_index):
+        fold_images = k_folds[fold_index % K_FOLD]
+        subset_df = train_df[train_df["image"].isin(fold_images)].reset_index(drop=True)
         ds = COCODataset(subset_df, train_images_dir, tokenizer, transform=train_transform)
         lengths = [caption_lens[c] for c in subset_df["caption"].tolist()]
         sampler = LengthBucketedBatchSampler(lengths, BATCH_SIZE)
         return DataLoader(ds, batch_sampler=sampler,
                           num_workers=NUM_WORKERS, collate_fn=collate, pin_memory=True)
 
-    train_loader = make_train_loader()
-    print(f"Training: {len(train_loader.dataset)} caption pairs (~{min(TRAIN_IMAGES_PER_EPOCH or len(all_train_images), len(all_train_images))} images)")
+    train_loader = make_train_loader(0)
+    print(f"Training: {len(train_loader.dataset)} caption pairs in first fold (~{fold_sizes[0]} images)")
 
     val_loader = DataLoader(
         COCODataset(val_df, val_images_dir, tokenizer, transform=val_transform, return_name=True),
@@ -293,7 +322,8 @@ def train(num_epochs=None):
     log_file.write(f"Caption loss weight: {CAPTION_LOSS_WEIGHT} | CLIP loss weight: {CLIP_LOSS_WEIGHT if clip_enabled else 0}\n")
     if clip_enabled:
         log_file.write(f"CLIP text cache: {clip_cache.embeddings.shape[0]} entries\n")
-    log_file.write(f"Training images: {len(train_loader.dataset)}\n")
+    log_file.write(f"Training images: {len(train_loader.dataset)} (fold 1/{K_FOLD})\n")
+    log_file.write(f"K-fold: {K_FOLD} deterministic folds, epoch e -> fold (e % {K_FOLD}), seed {SEED}\n")
     log_file.write("-" * 60 + "\n\n")
     log_file.flush()
 
@@ -353,8 +383,8 @@ def train(num_epochs=None):
     epoch = start_epoch - 1
     try:
         for epoch in range(start_epoch, effective_epochs):
-            if TRAIN_IMAGES_PER_EPOCH > 0:
-                train_loader = make_train_loader()
+            train_loader = make_train_loader(epoch)
+            fold_no = (epoch % K_FOLD) + 1
 
             model.train()
             epoch_cap_loss = 0
@@ -365,7 +395,7 @@ def train(num_epochs=None):
             optimizer.param_groups[1]["lr"] = DECODER_LR * warmup_factor
 
             epoch_label = f"{effective_epochs}" if effective_epochs < 90000 else "inf"
-            progress = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epoch_label} (imgs:{TRAIN_IMAGES_PER_EPOCH or 'all'})")
+            progress = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epoch_label} (fold {fold_no}/{K_FOLD})")
 
             batch_count = 0
             for batch in progress:
@@ -463,7 +493,8 @@ def train(num_epochs=None):
                 line += f" | ValLoss={avg_val:.4f}"
 
             if (epoch + 1) % VAL_BLEU_EVERY_N_EPOCHS == 0 and VAL_BLEU_SUBSET > 0:
-                subset = random.sample(val_image_list, min(VAL_BLEU_SUBSET, len(val_image_list)))
+                rng = random.Random(SEED * 1000 + (epoch + 1) // VAL_BLEU_EVERY_N_EPOCHS)
+                subset = rng.sample(val_image_list, min(VAL_BLEU_SUBSET, len(val_image_list)))
                 subset_df = val_df[val_df["image"].isin(subset)].reset_index(drop=True)
                 subset_loader = DataLoader(
                     COCODataset(subset_df, val_images_dir, tokenizer, transform=val_transform, return_name=True),
