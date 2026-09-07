@@ -106,6 +106,7 @@ CHECKPOINT_DIR = os.path.join(_CHECKPOINT_ROOT, STUDY_TAG) if STUDY_TAG else _CH
 MODEL_BEST_PATH = os.path.join(CHECKPOINT_DIR, "model_best.pth")
 MODEL_LATEST_PATH = os.path.join(CHECKPOINT_DIR, "model_latest.pth")
 TRAINING_LOG_PATH = os.path.join(CHECKPOINT_DIR, "training_log.txt")
+TRAINING_CSV_PATH = os.path.join(CHECKPOINT_DIR, "training_log.csv")
 RESUME_PATH = os.path.join(CHECKPOINT_DIR, "resume_state.pth")
 CLIP_CACHE_PATH = os.path.join(CHECKPOINT_DIR, "clip_text_cache.pth")
 

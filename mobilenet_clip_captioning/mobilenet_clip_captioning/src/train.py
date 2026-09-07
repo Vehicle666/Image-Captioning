@@ -1,6 +1,9 @@
+import csv
 import json
 import os
 import random
+import time
+from datetime import datetime
 
 import numpy as np
 import torch
@@ -37,6 +40,7 @@ from src.config import (
     SCHEDULER_PATIENCE,
     SEED,
     STUDY_TAG,
+    TRAINING_CSV_PATH,
     TRAINING_LOG_PATH,
     USE_CLIP,
     USE_V3_ENCODER,
@@ -59,6 +63,8 @@ from src.model import CaptioningModel, CLIPContrastiveLoss, CLIPTextCache
 from src.vocabulary import CaptionTokenizer
 
 torch.set_num_threads(min(16, os.cpu_count() or 8))
+
+CSV_HEADER = ["epoch", "fold", "timestamp", "seconds", "lr", "cap_loss", "clip_loss", "val_loss", "b1", "b4", "meteor", "cider", "is_best"]
 
 
 class LengthBucketedBatchSampler:
@@ -311,21 +317,35 @@ def train(num_epochs=None):
     scaler = GradScaler("cuda", enabled=torch.cuda.is_available())
 
     # ── Logging ────────────────────────────────────────────────
-    log_file = open(TRAINING_LOG_PATH, "w")
-    log_file.write("Training Log\n")
-    log_file.write(f"Device: {device}\n")
-    log_file.write(f"Config: {training_tag()} (STUDY_TAG={STUDY_TAG or 'default'})\n")
-    log_file.write(f"Tokenizer: {tokenizer.__class__.__name__} ({len(tokenizer)} tokens)\n")
-    log_file.write(f"Epochs: {effective_epochs} | Batch: {BATCH_SIZE}\n")
-    log_file.write(f"Embed: {EMBED_SIZE} | Hidden: {HIDDEN_SIZE} | Layers: {NUM_LAYERS} | Heads: {NUM_HEADS}\n")
-    log_file.write(f"Encoder LR: {ENCODER_LR} | Decoder LR: {DECODER_LR}\n")
-    log_file.write(f"Caption loss weight: {CAPTION_LOSS_WEIGHT} | CLIP loss weight: {CLIP_LOSS_WEIGHT if clip_enabled else 0}\n")
-    if clip_enabled:
-        log_file.write(f"CLIP text cache: {clip_cache.embeddings.shape[0]} entries\n")
-    log_file.write(f"Training images: {len(train_loader.dataset)} (fold 1/{K_FOLD})\n")
-    log_file.write(f"K-fold: {K_FOLD} deterministic folds, epoch e -> fold (e % {K_FOLD}), seed {SEED}\n")
-    log_file.write("-" * 60 + "\n\n")
+    # Append mode: a resume session appends on top of the previous history, so
+    # training_log.txt always covers the whole run from epoch 0, not just the
+    # latest session. The header is only written for a fresh (empty) file.
+    log_file = open(TRAINING_LOG_PATH, "a", encoding="utf-8")
+    log_resumed = os.path.exists(TRAINING_LOG_PATH) and os.path.getsize(TRAINING_LOG_PATH) > 0
+    if log_resumed:
+        log_file.write(f"\n===== Session resumed @ {datetime.now():%Y-%m-%d %H:%M:%S} =====\n")
+    else:
+        log_file.write("Training Log\n")
+        log_file.write(f"Device: {device}\n")
+        log_file.write(f"Config: {training_tag()} (STUDY_TAG={STUDY_TAG or 'default'})\n")
+        log_file.write(f"Tokenizer: {tokenizer.__class__.__name__} ({len(tokenizer)} tokens)\n")
+        log_file.write(f"Epochs: {effective_epochs} | Batch: {BATCH_SIZE}\n")
+        log_file.write(f"Embed: {EMBED_SIZE} | Hidden: {HIDDEN_SIZE} | Layers: {NUM_LAYERS} | Heads: {NUM_HEADS}\n")
+        log_file.write(f"Encoder LR: {ENCODER_LR} | Decoder LR: {DECODER_LR}\n")
+        log_file.write(f"Caption loss weight: {CAPTION_LOSS_WEIGHT} | CLIP loss weight: {CLIP_LOSS_WEIGHT if clip_enabled else 0}\n")
+        if clip_enabled:
+            log_file.write(f"CLIP text cache: {clip_cache.embeddings.shape[0]} entries\n")
+        log_file.write(f"Training images: {len(train_loader.dataset)} (fold 1/{K_FOLD})\n")
+        log_file.write(f"K-fold: {K_FOLD} deterministic folds, epoch e -> fold (e % {K_FOLD}), seed {SEED}\n")
+        log_file.write("-" * 60 + "\n\n")
     log_file.flush()
+
+    # Machine-readable per-epoch sidecar: header written once, rows appended
+    # every epoch (including resumed sessions) so loss/BLEU curves are trivial
+    # to plot from CSV.
+    if not (os.path.exists(TRAINING_CSV_PATH) and os.path.getsize(TRAINING_CSV_PATH) > 0):
+        with open(TRAINING_CSV_PATH, "w", newline="", encoding="utf-8") as cf:
+            csv.writer(cf).writerow(CSV_HEADER)
 
     # ── Training loop ──────────────────────────────────────────
     best_bleu4 = 0
@@ -396,6 +416,7 @@ def train(num_epochs=None):
 
             epoch_label = f"{effective_epochs}" if effective_epochs < 90000 else "inf"
             progress = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epoch_label} (fold {fold_no}/{K_FOLD})")
+            epoch_start = time.time()
 
             batch_count = 0
             for batch in progress:
@@ -486,12 +507,18 @@ def train(num_epochs=None):
             elif run_val:
                 patience_counter += 1
 
-            line = f"Epoch {epoch+1}: CapLoss={avg_cap:.4f}"
+            elapsed = time.time() - epoch_start
+            lr_used = optimizer.param_groups[1]["lr"]
+
+            line = f"Epoch {epoch+1}: fold {fold_no}/{K_FOLD} | CapLoss={avg_cap:.4f}"
             if clip_enabled:
                 line += f" | CLIP={avg_clip:.4f}"
             if run_val:
                 line += f" | ValLoss={avg_val:.4f}"
+            line += f" | lr={lr_used:.2g} | {elapsed:.0f}s"
 
+            b1 = b4 = meteor = cider = ""
+            is_best = False
             if (epoch + 1) % VAL_BLEU_EVERY_N_EPOCHS == 0 and VAL_BLEU_SUBSET > 0:
                 rng = random.Random(SEED * 1000 + (epoch + 1) // VAL_BLEU_EVERY_N_EPOCHS)
                 subset = rng.sample(val_image_list, min(VAL_BLEU_SUBSET, len(val_image_list)))
@@ -515,20 +542,40 @@ def train(num_epochs=None):
 
                 from src.evaluate import compute_caption_metrics
                 metrics = compute_caption_metrics(hyps, refs)
-                line += f" | B1={metrics['bleu1']:.4f} B4={metrics['bleu4']:.4f}"
-                if metrics["meteor"] is not None:
-                    line += f" M={metrics['meteor']:.4f}"
-                if metrics["cider"] is not None:
-                    line += f" C={metrics['cider']:.4f}"
+                b1, b4 = metrics["bleu1"], metrics["bleu4"]
+                meteor, cider = metrics["meteor"], metrics["cider"]
+                line += f" | B1={b1:.4f} B4={b4:.4f}"
+                if meteor is not None:
+                    line += f" M={meteor:.4f}"
+                if cider is not None:
+                    line += f" C={cider:.4f}"
 
                 if metrics["bleu4"] > best_bleu4:
                     best_bleu4 = metrics["bleu4"]
                     torch.save(model.state_dict(), MODEL_BEST_PATH)
                     line += " *best*"
+                    is_best = True
 
             print(line)
             log_file.write(line + "\n")
             log_file.flush()
+
+            with open(TRAINING_CSV_PATH, "a", newline="", encoding="utf-8") as cf:
+                csv.writer(cf).writerow([
+                    epoch + 1,
+                    fold_no,
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    f"{elapsed:.1f}",
+                    f"{lr_used:.3g}",
+                    f"{avg_cap:.4f}",
+                    f"{avg_clip:.4f}",
+                    f"{avg_val:.4f}" if run_val else "",
+                    f"{b1:.4f}" if isinstance(b1, float) else "",
+                    f"{b4:.4f}" if isinstance(b4, float) else "",
+                    f"{meteor:.4f}" if isinstance(meteor, float) else "",
+                    f"{cider:.4f}" if isinstance(cider, float) else "",
+                    1 if is_best else 0,
+                ])
             torch.save(model.state_dict(), MODEL_LATEST_PATH)
 
             tmp = RESUME_PATH + ".tmp"
