@@ -312,7 +312,7 @@ class TransformerDecoder(nn.Module):
     def forward(self, encoder_features, captions):
         tgt_len = captions.size(1)
         causal_mask = torch.triu(
-            torch.full((tgt_len, tgt_len), float("-inf"), device=captions.device), diagonal=1,
+            torch.ones(tgt_len, tgt_len, dtype=torch.bool, device=captions.device), diagonal=1,
         )
         tgt_padding_mask = captions == self.pad_token_id
 
