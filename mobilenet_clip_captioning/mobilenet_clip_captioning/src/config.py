@@ -1,15 +1,10 @@
 import os
 import torch
 
-os.environ["HF_HOME"] = "D:/AI_Cache/huggingface"
-os.environ["HF_HUB_CACHE"] = "D:/AI_Cache/huggingface/hub"
-os.environ["TORCH_HOME"] = "D:/AI_Cache/torch"
-os.environ["KAGGLE_CACHE_DIR"] = "D:/AI_Cache/kagglehub"
-
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # ── Dataset paths ──────────────────────────────────────────────
-DATASET_DIR = "D:/coco_dataset/coco2017"
+DATASET_DIR = "E:/Image Captioning/coco_dataset/coco2017"
 TRAIN_IMAGES = os.path.join(DATASET_DIR, "train2017")
 VAL_IMAGES = os.path.join(DATASET_DIR, "val2017")
 TRAIN_ANN = os.path.join(DATASET_DIR, "annotations", "captions_train2017.json")
