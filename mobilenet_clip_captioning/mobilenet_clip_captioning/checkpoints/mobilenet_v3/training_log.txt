@@ -1,0 +1,334 @@
+Training Log
+Device: cuda
+Config: [mobilenet_v3_small +mobilenet_v3_large] (STUDY_TAG=mobilenet_v3)
+Tokenizer: CaptionTokenizer (49409 tokens)
+Epochs: 600 | Batch: 16
+Embed: 384 | Hidden: 768 | Layers: 4 | Heads: 6
+Encoder LR: 1e-05 | Decoder LR: 0.0001
+Caption loss weight: 1.0 | CLIP loss weight: 0
+Training images: 29584 (fold 1/20)
+K-fold: 20 deterministic folds, epoch e -> fold (e % 20), seed 42
+------------------------------------------------------------
+
+Epoch 1: CapLoss=29.8312
+Epoch 2: CapLoss=16.4846
+Epoch 3: CapLoss=10.4088
+Epoch 4: CapLoss=7.9433
+Epoch 5: CapLoss=6.7005
+Epoch 6: CapLoss=6.0189 | B1=0.5021 B4=0.1167 C=0.3168 *best*
+Epoch 7: CapLoss=5.5536
+Epoch 8: CapLoss=5.2605
+Epoch 9: CapLoss=5.0418
+Epoch 10: CapLoss=4.8790
+Epoch 11: CapLoss=4.7176
+Epoch 12: CapLoss=4.6166 | B1=0.5479 B4=0.1651 C=0.4841 *best*
+Epoch 13: CapLoss=4.5031
+Epoch 14: CapLoss=4.4289
+Epoch 15: CapLoss=4.3640 | ValLoss=4.2566
+Epoch 16: CapLoss=4.3149
+Epoch 17: CapLoss=4.2643
+Epoch 18: CapLoss=4.2152 | B1=0.5611 B4=0.1806 C=0.5173 *best*
+Epoch 19: CapLoss=4.1840
+Epoch 20: CapLoss=4.1442
+Epoch 21: CapLoss=4.1247
+Epoch 22: CapLoss=4.1033
+Epoch 23: CapLoss=4.0498
+Epoch 24: CapLoss=4.0492 | B1=0.5512 B4=0.1806 C=0.5335 *best*
+Epoch 25: CapLoss=4.0196
+Epoch 26: CapLoss=4.0055
+Epoch 27: CapLoss=3.9735
+Epoch 28: CapLoss=3.9731
+Epoch 29: CapLoss=3.9434
+Epoch 30: CapLoss=3.9319 | ValLoss=3.8894 | B1=0.5735 B4=0.2151 C=0.6454 *best*
+Epoch 31: CapLoss=3.8918
+Epoch 32: CapLoss=3.9061
+Epoch 33: CapLoss=3.8840
+Epoch 34: CapLoss=3.8764
+Epoch 35: CapLoss=3.8600
+Epoch 36: CapLoss=3.8534 | B1=0.5995 B4=0.1948 C=0.6338
+Epoch 37: CapLoss=3.8395
+Epoch 38: CapLoss=3.8172
+Epoch 39: CapLoss=3.8129
+Epoch 40: CapLoss=3.7961
+Epoch 41: CapLoss=3.7986
+Epoch 42: CapLoss=3.7968 | B1=0.5674 B4=0.1702 C=0.5495
+Epoch 43: CapLoss=3.7619
+Epoch 44: CapLoss=3.7721
+Epoch 45: CapLoss=3.7598 | ValLoss=3.7378
+Epoch 46: CapLoss=3.7557
+Epoch 47: CapLoss=3.7373
+Epoch 48: CapLoss=3.7506 | B1=0.5669 B4=0.1725 C=0.5918
+Epoch 49: CapLoss=3.7308
+Epoch 50: CapLoss=3.7315
+Epoch 51: CapLoss=3.7021
+Epoch 52: CapLoss=3.7230
+Epoch 53: CapLoss=3.7147
+Epoch 54: CapLoss=3.7159 | B1=0.5688 B4=0.1693 C=0.5772
+
+Interrupted at epoch 55
+
+===== Session resumed @ 2026-09-07 15:08:58 =====
+Resumed from epoch 55
+Epoch 56: fold 16/20 | CapLoss=3.7121 | lr=0.0001 | 233s
+
+===== Session resumed @ 2026-09-07 15:14:56 =====
+Resumed from epoch 56
+Epoch 57: fold 17/20 | CapLoss=3.7023 | lr=0.0001 | 219s
+Epoch 58: fold 18/20 | CapLoss=3.6906 | lr=0.0001 | 207s
+Epoch 59: fold 19/20 | CapLoss=3.6920 | lr=0.0001 | 207s
+Epoch 60: fold 20/20 | CapLoss=3.6837 | ValLoss=3.6831 | lr=0.0001 | 314s | B1=0.5787 B4=0.1898 C=0.5886
+Epoch 61: fold 1/20 | CapLoss=3.6979 | lr=0.0001 | 205s
+Epoch 62: fold 2/20 | CapLoss=3.6976 | lr=0.0001 | 205s
+Epoch 63: fold 3/20 | CapLoss=3.6720 | lr=0.0001 | 206s
+Epoch 64: fold 4/20 | CapLoss=3.6895 | lr=0.0001 | 204s
+Epoch 65: fold 5/20 | CapLoss=3.6866 | lr=0.0001 | 205s
+Epoch 66: fold 6/20 | CapLoss=3.6931 | lr=0.0001 | 204s | B1=0.5976 B4=0.1986 C=0.6199
+Epoch 67: fold 7/20 | CapLoss=3.6876 | lr=0.0001 | 202s
+Epoch 68: fold 8/20 | CapLoss=3.7160 | lr=0.0001 | 203s
+Epoch 69: fold 9/20 | CapLoss=3.7353 | lr=0.0001 | 204s
+Epoch 70: fold 10/20 | CapLoss=3.8016 | lr=0.0001 | 205s
+Epoch 71: fold 11/20 | CapLoss=3.8284 | lr=0.0001 | 205s
+Epoch 72: fold 12/20 | CapLoss=3.9004 | lr=0.0001 | 205s | B1=0.5907 B4=0.2170 C=0.5981 *best*
+Epoch 73: fold 13/20 | CapLoss=4.0737 | lr=0.0001 | 202s
+Epoch 74: fold 14/20 | CapLoss=5.3358 | lr=0.0001 | 202s
+Epoch 75: fold 15/20 | CapLoss=5.1126 | ValLoss=4.8885 | lr=0.0001 | 311s
+Epoch 76: fold 16/20 | CapLoss=5.2575 | lr=0.0001 | 205s
+Epoch 77: fold 17/20 | CapLoss=5.3971 | lr=0.0001 | 206s
+Epoch 78: fold 18/20 | CapLoss=5.5763 | lr=0.0001 | 206s | B1=0.0434 B4=0.0008 C=0.0001
+Epoch 79: fold 19/20 | CapLoss=5.7770 | lr=0.0001 | 204s
+Epoch 80: fold 20/20 | CapLoss=5.7153 | lr=0.0001 | 206s
+Epoch 81: fold 1/20 | CapLoss=5.6843 | lr=0.0001 | 204s
+Epoch 82: fold 2/20 | CapLoss=5.6661 | lr=0.0001 | 204s
+Epoch 83: fold 3/20 | CapLoss=5.6861 | lr=0.0001 | 205s
+Epoch 84: fold 4/20 | CapLoss=5.6836 | lr=0.0001 | 206s | B1=0.0138 B4=0.0003 C=0.0017
+Epoch 85: fold 5/20 | CapLoss=5.7453 | lr=0.0001 | 205s
+Epoch 86: fold 6/20 | CapLoss=5.6993 | lr=0.0001 | 204s
+Epoch 87: fold 7/20 | CapLoss=5.7073 | lr=0.0001 | 203s
+Epoch 88: fold 8/20 | CapLoss=5.7001 | lr=0.0001 | 204s
+Epoch 89: fold 9/20 | CapLoss=5.7831 | lr=0.0001 | 208s
+Epoch 90: fold 10/20 | CapLoss=5.7339 | ValLoss=5.6838 | lr=0.0001 | 315s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 91: fold 11/20 | CapLoss=5.6788 | lr=0.0001 | 227s
+Epoch 92: fold 12/20 | CapLoss=5.6659 | lr=0.0001 | 203s
+Epoch 93: fold 13/20 | CapLoss=5.6795 | lr=0.0001 | 201s
+Epoch 94: fold 14/20 | CapLoss=5.6929 | lr=0.0001 | 203s
+Epoch 95: fold 15/20 | CapLoss=5.7526 | lr=0.0001 | 201s
+Epoch 96: fold 16/20 | CapLoss=5.7118 | lr=0.0001 | 201s | B1=0.0374 B4=0.0002 C=0.0013
+Epoch 97: fold 17/20 | CapLoss=5.7056 | lr=0.0001 | 202s
+Epoch 98: fold 18/20 | CapLoss=5.6985 | lr=0.0001 | 202s
+Epoch 99: fold 19/20 | CapLoss=5.6859 | lr=0.0001 | 203s
+Epoch 100: fold 20/20 | CapLoss=5.6860 | lr=0.0001 | 203s
+Epoch 101: fold 1/20 | CapLoss=5.7082 | lr=0.0001 | 202s
+Epoch 102: fold 2/20 | CapLoss=5.6877 | lr=0.0001 | 202s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 103: fold 3/20 | CapLoss=5.6729 | lr=0.0001 | 201s
+Epoch 104: fold 4/20 | CapLoss=5.6905 | lr=0.0001 | 203s
+Epoch 105: fold 5/20 | CapLoss=5.6391 | ValLoss=5.7016 | lr=0.0001 | 310s
+Epoch 106: fold 6/20 | CapLoss=5.6469 | lr=0.0001 | 219s
+Epoch 107: fold 7/20 | CapLoss=5.6800 | lr=0.0001 | 207s
+Epoch 108: fold 8/20 | CapLoss=5.6892 | lr=0.0001 | 207s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 109: fold 9/20 | CapLoss=5.6683 | lr=0.0001 | 202s
+Epoch 110: fold 10/20 | CapLoss=5.6626 | lr=0.0001 | 204s
+Epoch 111: fold 11/20 | CapLoss=5.6712 | lr=0.0001 | 206s
+Epoch 112: fold 12/20 | CapLoss=5.7284 | lr=0.0001 | 204s
+Epoch 113: fold 13/20 | CapLoss=5.7439 | lr=0.0001 | 205s
+Epoch 114: fold 14/20 | CapLoss=5.7885 | lr=0.0001 | 204s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 115: fold 15/20 | CapLoss=5.7980 | lr=0.0001 | 205s
+Epoch 116: fold 16/20 | CapLoss=5.7711 | lr=0.0001 | 205s
+Epoch 117: fold 17/20 | CapLoss=5.7008 | lr=0.0001 | 203s
+Epoch 118: fold 18/20 | CapLoss=5.6714 | lr=0.0001 | 204s
+
+Interrupted at epoch 119
+
+===== Session resumed @ 2026-09-08 00:51:02 =====
+Resumed from epoch 119
+Epoch 120: fold 20/20 | CapLoss=5.7133 | ValLoss=5.6579 | lr=0.0001 | 322s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 121: fold 1/20 | CapLoss=5.6649 | lr=0.0001 | 204s
+Epoch 122: fold 2/20 | CapLoss=5.5795 | lr=0.0001 | 202s
+Epoch 123: fold 3/20 | CapLoss=5.5152 | lr=0.0001 | 202s
+Epoch 124: fold 4/20 | CapLoss=5.5455 | lr=0.0001 | 203s
+Epoch 125: fold 5/20 | CapLoss=5.6416 | lr=0.0001 | 202s
+Epoch 126: fold 6/20 | CapLoss=5.6012 | lr=0.0001 | 204s | B1=0.0351 B4=0.0002 C=0.0000
+Epoch 127: fold 7/20 | CapLoss=5.5742 | lr=0.0001 | 204s
+Epoch 128: fold 8/20 | CapLoss=5.5844 | lr=0.0001 | 205s
+Epoch 129: fold 9/20 | CapLoss=5.5578 | lr=0.0001 | 205s
+Epoch 130: fold 10/20 | CapLoss=5.5942 | lr=0.0001 | 204s
+Epoch 131: fold 11/20 | CapLoss=5.5692 | lr=0.0001 | 207s
+Epoch 132: fold 12/20 | CapLoss=5.5982 | lr=0.0001 | 209s | B1=0.0374 B4=0.0003 C=0.0050
+Epoch 133: fold 13/20 | CapLoss=5.5491 | lr=0.0001 | 205s
+Epoch 134: fold 14/20 | CapLoss=5.6062 | lr=0.0001 | 205s
+Epoch 135: fold 15/20 | CapLoss=5.6313 | ValLoss=5.6373 | lr=0.0001 | 310s
+Epoch 136: fold 16/20 | CapLoss=5.6885 | lr=0.0001 | 205s
+Epoch 137: fold 17/20 | CapLoss=5.6567 | lr=0.0001 | 203s
+Epoch 138: fold 18/20 | CapLoss=5.6730 | lr=0.0001 | 204s | B1=0.0410 B4=0.0001 C=0.0143
+Epoch 139: fold 19/20 | CapLoss=5.7088 | lr=0.0001 | 204s
+Epoch 140: fold 20/20 | CapLoss=5.7485 | lr=0.0001 | 203s
+Epoch 141: fold 1/20 | CapLoss=5.7547 | lr=0.0001 | 204s
+Epoch 142: fold 2/20 | CapLoss=5.7588 | lr=0.0001 | 204s
+Epoch 143: fold 3/20 | CapLoss=5.7353 | lr=0.0001 | 204s
+Epoch 144: fold 4/20 | CapLoss=5.7266 | lr=0.0001 | 205s | B1=0.0387 B4=0.0001 C=0.0000
+Epoch 145: fold 5/20 | CapLoss=5.7482 | lr=0.0001 | 204s
+Epoch 146: fold 6/20 | CapLoss=5.7465 | lr=0.0001 | 203s
+Epoch 147: fold 7/20 | CapLoss=5.6964 | lr=0.0001 | 203s
+Epoch 148: fold 8/20 | CapLoss=5.7054 | lr=0.0001 | 204s
+Epoch 149: fold 9/20 | CapLoss=5.7510 | lr=0.0001 | 203s
+Epoch 150: fold 10/20 | CapLoss=5.7226 | ValLoss=5.5512 | lr=0.0001 | 310s | B1=0.0462 B4=0.0002 C=0.0435
+Epoch 151: fold 11/20 | CapLoss=5.6957 | lr=0.0001 | 205s
+Epoch 152: fold 12/20 | CapLoss=5.6314 | lr=0.0001 | 204s
+Epoch 153: fold 13/20 | CapLoss=5.8243 | lr=0.0001 | 205s
+Epoch 154: fold 14/20 | CapLoss=5.8679 | lr=0.0001 | 204s
+Epoch 155: fold 15/20 | CapLoss=5.8681 | lr=0.0001 | 205s
+Epoch 156: fold 16/20 | CapLoss=5.8044 | lr=0.0001 | 206s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 157: fold 17/20 | CapLoss=5.7733 | lr=0.0001 | 235s
+Epoch 158: fold 18/20 | CapLoss=5.7214 | lr=0.0001 | 204s
+Epoch 159: fold 19/20 | CapLoss=5.6279 | lr=0.0001 | 204s
+Epoch 160: fold 20/20 | CapLoss=5.6084 | lr=0.0001 | 203s
+Epoch 161: fold 1/20 | CapLoss=5.6047 | lr=0.0001 | 203s
+Epoch 162: fold 2/20 | CapLoss=5.6034 | lr=0.0001 | 204s | B1=0.0046 B4=0.0001 C=0.0000
+Epoch 163: fold 3/20 | CapLoss=5.5939 | lr=0.0001 | 204s
+Epoch 164: fold 4/20 | CapLoss=5.7076 | lr=0.0001 | 204s
+Epoch 165: fold 5/20 | CapLoss=5.7427 | ValLoss=5.6818 | lr=5e-05 | 309s
+Epoch 166: fold 6/20 | CapLoss=5.6700 | lr=0.0001 | 204s
+Epoch 167: fold 7/20 | CapLoss=5.6028 | lr=0.0001 | 205s
+Epoch 168: fold 8/20 | CapLoss=5.6039 | lr=0.0001 | 204s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 169: fold 9/20 | CapLoss=5.6844 | lr=0.0001 | 203s
+Epoch 170: fold 10/20 | CapLoss=5.6972 | lr=0.0001 | 202s
+Epoch 171: fold 11/20 | CapLoss=5.6972 | lr=0.0001 | 203s
+Epoch 172: fold 12/20 | CapLoss=5.7564 | lr=0.0001 | 202s
+Epoch 173: fold 13/20 | CapLoss=5.7259 | lr=0.0001 | 203s
+Epoch 174: fold 14/20 | CapLoss=5.7420 | lr=0.0001 | 204s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 175: fold 15/20 | CapLoss=5.7632 | lr=0.0001 | 203s
+Epoch 176: fold 16/20 | CapLoss=5.7525 | lr=0.0001 | 203s
+Epoch 177: fold 17/20 | CapLoss=5.7527 | lr=0.0001 | 201s
+Epoch 178: fold 18/20 | CapLoss=5.7396 | lr=0.0001 | 202s
+Epoch 179: fold 19/20 | CapLoss=5.7584 | lr=0.0001 | 201s
+Epoch 180: fold 20/20 | CapLoss=5.7775 | ValLoss=5.6709 | lr=0.0001 | 308s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 181: fold 1/20 | CapLoss=5.7656 | lr=0.0001 | 203s
+Epoch 182: fold 2/20 | CapLoss=5.7452 | lr=0.0001 | 203s
+Epoch 183: fold 3/20 | CapLoss=5.7812 | lr=0.0001 | 202s
+Epoch 184: fold 4/20 | CapLoss=5.8137 | lr=0.0001 | 202s
+Epoch 185: fold 5/20 | CapLoss=5.8403 | lr=0.0001 | 203s
+Epoch 186: fold 6/20 | CapLoss=5.8247 | lr=0.0001 | 204s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 187: fold 7/20 | CapLoss=5.8390 | lr=0.0001 | 204s
+Epoch 188: fold 8/20 | CapLoss=5.8862 | lr=0.0001 | 204s
+Epoch 189: fold 9/20 | CapLoss=5.8608 | lr=0.0001 | 205s
+Epoch 190: fold 10/20 | CapLoss=6.1045 | lr=0.0001 | 203s
+Epoch 191: fold 11/20 | CapLoss=6.1653 | lr=0.0001 | 204s
+Epoch 192: fold 12/20 | CapLoss=5.9971 | lr=0.0001 | 203s | B1=0.0081 B4=0.0001 C=0.0000
+Epoch 193: fold 13/20 | CapLoss=5.9842 | lr=0.0001 | 202s
+Epoch 194: fold 14/20 | CapLoss=5.9484 | lr=0.0001 | 203s
+Epoch 195: fold 15/20 | CapLoss=5.9841 | ValLoss=6.0170 | lr=0.0001 | 308s
+Epoch 196: fold 16/20 | CapLoss=6.0419 | lr=0.0001 | 204s
+Epoch 197: fold 17/20 | CapLoss=5.9770 | lr=0.0001 | 203s
+Epoch 198: fold 18/20 | CapLoss=5.9929 | lr=0.0001 | 203s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 199: fold 19/20 | CapLoss=6.0900 | lr=0.0001 | 203s
+Epoch 200: fold 20/20 | CapLoss=6.1311 | lr=0.0001 | 203s
+Epoch 201: fold 1/20 | CapLoss=6.0635 | lr=0.0001 | 204s
+Epoch 202: fold 2/20 | CapLoss=5.9796 | lr=0.0001 | 204s
+Epoch 203: fold 3/20 | CapLoss=5.9071 | lr=0.0001 | 205s
+Epoch 204: fold 4/20 | CapLoss=5.9291 | lr=0.0001 | 204s | B1=0.0367 B4=0.0001 C=0.0000
+Epoch 205: fold 5/20 | CapLoss=5.8821 | lr=0.0001 | 204s
+Epoch 206: fold 6/20 | CapLoss=5.9297 | lr=0.0001 | 204s
+Epoch 207: fold 7/20 | CapLoss=5.9039 | lr=0.0001 | 205s
+Epoch 208: fold 8/20 | CapLoss=5.8665 | lr=0.0001 | 204s
+Epoch 209: fold 9/20 | CapLoss=5.8920 | lr=0.0001 | 205s
+Epoch 210: fold 10/20 | CapLoss=5.9262 | ValLoss=5.9370 | lr=0.0001 | 311s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 211: fold 11/20 | CapLoss=5.8979 | lr=0.0001 | 204s
+Epoch 212: fold 12/20 | CapLoss=5.9902 | lr=0.0001 | 204s
+Epoch 213: fold 13/20 | CapLoss=6.0019 | lr=0.0001 | 205s
+Epoch 214: fold 14/20 | CapLoss=6.0009 | lr=0.0001 | 204s
+Epoch 215: fold 15/20 | CapLoss=6.0027 | lr=0.0001 | 204s
+Epoch 216: fold 16/20 | CapLoss=5.9754 | lr=0.0001 | 205s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 217: fold 17/20 | CapLoss=5.6457 | lr=0.0001 | 230s
+Epoch 218: fold 18/20 | CapLoss=5.5995 | lr=0.0001 | 208s
+Epoch 219: fold 19/20 | CapLoss=5.7358 | lr=0.0001 | 204s
+Epoch 220: fold 20/20 | CapLoss=5.6921 | lr=0.0001 | 205s
+Epoch 221: fold 1/20 | CapLoss=5.7059 | lr=0.0001 | 206s
+Epoch 222: fold 2/20 | CapLoss=5.7007 | lr=0.0001 | 204s | B1=0.0388 B4=0.0001 C=0.0000
+Epoch 223: fold 3/20 | CapLoss=5.7601 | lr=0.0001 | 205s
+Epoch 224: fold 4/20 | CapLoss=5.7331 | lr=0.0001 | 205s
+Epoch 225: fold 5/20 | CapLoss=5.7682 | ValLoss=5.7956 | lr=0.0001 | 310s
+Epoch 226: fold 6/20 | CapLoss=5.8088 | lr=0.0001 | 204s
+Epoch 227: fold 7/20 | CapLoss=5.8006 | lr=0.0001 | 203s
+Epoch 228: fold 8/20 | CapLoss=5.8333 | lr=0.0001 | 204s | B1=0.0128 B4=0.0002 C=0.0000
+Epoch 229: fold 9/20 | CapLoss=5.8108 | lr=0.0001 | 205s
+Epoch 230: fold 10/20 | CapLoss=5.8679 | lr=0.0001 | 205s
+Epoch 231: fold 11/20 | CapLoss=5.8361 | lr=0.0001 | 171s
+Epoch 232: fold 12/20 | CapLoss=5.8712 | lr=0.0001 | 172s
+Epoch 233: fold 13/20 | CapLoss=5.6504 | lr=0.0001 | 169s
+Epoch 234: fold 14/20 | CapLoss=5.9001 | lr=0.0001 | 169s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 235: fold 15/20 | CapLoss=5.7942 | lr=0.0001 | 168s
+Epoch 236: fold 16/20 | CapLoss=5.8815 | lr=0.0001 | 173s
+Epoch 237: fold 17/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 238: fold 18/20 | CapLoss=5.9408 | lr=0.0001 | 171s
+Epoch 239: fold 19/20 | CapLoss=5.9187 | lr=0.0001 | 171s
+Epoch 240: fold 20/20 | CapLoss=5.7494 | ValLoss=5.8546 | lr=0.0001 | 275s | B1=0.0017 B4=0.0000 C=0.0000
+Epoch 241: fold 1/20 | CapLoss=5.5117 | lr=0.0001 | 171s
+Epoch 242: fold 2/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 243: fold 3/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 244: fold 4/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 245: fold 5/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 246: fold 6/20 | CapLoss=0.0000 | lr=0.0001 | 170s | B1=0.0022 B4=0.0000 C=0.0000
+Epoch 247: fold 7/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 248: fold 8/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 249: fold 9/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 250: fold 10/20 | CapLoss=0.0000 | lr=0.0001 | 174s
+Epoch 251: fold 11/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 252: fold 12/20 | CapLoss=0.0000 | lr=0.0001 | 171s | B1=0.0001 B4=0.0000 C=0.0000
+
+Interrupted at epoch 253
+
+===== Session resumed @ 2026-09-15 13:38:56 =====
+Resumed from epoch 253
+Epoch 254: fold 14/20 | CapLoss=0.0000 | lr=0.0001 | 177s
+Epoch 255: fold 15/20 | CapLoss=0.0000 | ValLoss=5.8540 | lr=0.0001 | 295s
+Epoch 256: fold 16/20 | CapLoss=0.0000 | lr=0.0001 | 182s
+Epoch 257: fold 17/20 | CapLoss=0.0000 | lr=0.0001 | 189s
+Epoch 258: fold 18/20 | CapLoss=0.0000 | lr=0.0001 | 179s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 259: fold 19/20 | CapLoss=0.0000 | lr=0.0001 | 174s
+Epoch 260: fold 20/20 | CapLoss=0.0000 | lr=0.0001 | 168s
+Epoch 261: fold 1/20 | CapLoss=0.0000 | lr=0.0001 | 168s
+Epoch 262: fold 2/20 | CapLoss=0.0000 | lr=0.0001 | 172s
+Epoch 263: fold 3/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 264: fold 4/20 | CapLoss=0.0000 | lr=0.0001 | 170s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 265: fold 5/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 266: fold 6/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 267: fold 7/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 268: fold 8/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 269: fold 9/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 270: fold 10/20 | CapLoss=0.0000 | ValLoss=5.8542 | lr=5e-05 | 277s | B1=0.0004 B4=0.0000 C=0.0000
+Epoch 271: fold 11/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 272: fold 12/20 | CapLoss=0.0000 | lr=0.0001 | 167s
+Epoch 273: fold 13/20 | CapLoss=0.0000 | lr=0.0001 | 168s
+Epoch 274: fold 14/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 275: fold 15/20 | CapLoss=5.5859 | lr=0.0001 | 176s
+Epoch 276: fold 16/20 | CapLoss=0.0000 | lr=0.0001 | 168s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 277: fold 17/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 278: fold 18/20 | CapLoss=0.0000 | lr=0.0001 | 168s
+Epoch 279: fold 19/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 280: fold 20/20 | CapLoss=0.0000 | lr=0.0001 | 192s
+Epoch 281: fold 1/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 282: fold 2/20 | CapLoss=0.0000 | lr=0.0001 | 169s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 283: fold 3/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 284: fold 4/20 | CapLoss=0.0000 | lr=0.0001 | 169s
+Epoch 285: fold 5/20 | CapLoss=0.0000 | ValLoss=5.8535 | lr=0.0001 | 272s
+Epoch 286: fold 6/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 287: fold 7/20 | CapLoss=0.0000 | lr=0.0001 | 168s
+Epoch 288: fold 8/20 | CapLoss=0.0000 | lr=0.0001 | 172s | B1=0.0005 B4=0.0000 C=0.0000
+Epoch 289: fold 9/20 | CapLoss=0.0000 | lr=0.0001 | 183s
+Epoch 290: fold 10/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 291: fold 11/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 292: fold 12/20 | CapLoss=0.0000 | lr=0.0001 | 181s
+Epoch 293: fold 13/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 294: fold 14/20 | CapLoss=0.0000 | lr=0.0001 | 171s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 295: fold 15/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 296: fold 16/20 | CapLoss=0.0000 | lr=0.0001 | 172s
+Epoch 297: fold 17/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 298: fold 18/20 | CapLoss=5.8883 | lr=0.0001 | 170s
+Epoch 299: fold 19/20 | CapLoss=0.0000 | lr=0.0001 | 172s
+Epoch 300: fold 20/20 | CapLoss=0.0000 | ValLoss=5.8529 | lr=0.0001 | 273s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 301: fold 1/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 302: fold 2/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 303: fold 3/20 | CapLoss=0.0000 | lr=0.0001 | 171s
+Epoch 304: fold 4/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+Epoch 305: fold 5/20 | CapLoss=0.0000 | lr=0.0001 | 170s
+
+Interrupted at epoch 306
