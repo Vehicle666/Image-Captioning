@@ -1,0 +1,539 @@
+Training Log
+Device: cuda
+Config: [mobilenet_v3_small] (STUDY_TAG=baseline_mobilenet)
+Tokenizer: CaptionTokenizer (49409 tokens)
+Epochs: 600 | Batch: 16
+Embed: 384 | Hidden: 768 | Layers: 4 | Heads: 6
+Encoder LR: 1e-05 | Decoder LR: 0.0001
+Caption loss weight: 1.0 | CLIP loss weight: 0
+Training images: 27515
+------------------------------------------------------------
+
+Epoch 1: CapLoss=30.9579
+Epoch 2: CapLoss=17.6080
+Epoch 3: CapLoss=11.0492
+Epoch 4: CapLoss=8.1810
+Epoch 5: CapLoss=6.8287
+Epoch 6: CapLoss=6.1293 | B1=0.4530 B4=0.0851 C=0.2163 *best*
+Epoch 7: CapLoss=5.6438
+Epoch 8: CapLoss=5.3232
+Epoch 9: CapLoss=5.1142
+Epoch 10: CapLoss=4.9397
+Epoch 11: CapLoss=4.7919
+Epoch 12: CapLoss=4.6430 | B1=0.5021 B4=0.1205 C=0.3266 *best*
+Epoch 13: CapLoss=4.5527
+Epoch 14: CapLoss=4.4818
+Epoch 15: CapLoss=4.4131 | ValLoss=4.3376
+Epoch 16: CapLoss=4.3686
+Epoch 17: CapLoss=4.3301
+Epoch 18: CapLoss=4.2707 | B1=0.5361 B4=0.1567 C=0.4173 *best*
+Epoch 19: CapLoss=4.2332
+Epoch 20: CapLoss=4.2138
+Epoch 21: CapLoss=4.1714
+Epoch 22: CapLoss=4.1576
+Epoch 23: CapLoss=4.1413
+Epoch 24: CapLoss=4.0874 | B1=0.5497 B4=0.1848 C=0.5191 *best*
+Epoch 25: CapLoss=4.0908
+Epoch 26: CapLoss=4.0680
+Epoch 27: CapLoss=4.0509
+Epoch 28: CapLoss=4.0275
+Epoch 29: CapLoss=4.0113
+Epoch 30: CapLoss=3.9959 | ValLoss=3.9606 | B1=0.5520 B4=0.1612 C=0.4555
+Epoch 31: CapLoss=3.9732
+Epoch 32: CapLoss=3.9543
+Epoch 33: CapLoss=3.9564
+Epoch 34: CapLoss=3.9386
+Epoch 35: CapLoss=3.9252
+Epoch 36: CapLoss=3.9145 | B1=0.5533 B4=0.1850 C=0.5177 *best*
+Epoch 37: CapLoss=3.8950
+Epoch 38: CapLoss=3.8805
+Epoch 39: CapLoss=3.8927
+Epoch 40: CapLoss=3.8468
+Epoch 41: CapLoss=3.8531
+Epoch 42: CapLoss=3.8426 | B1=0.5694 B4=0.1906 C=0.5173 *best*
+Epoch 43: CapLoss=3.8312
+Epoch 44: CapLoss=3.8307
+Epoch 45: CapLoss=3.8117 | ValLoss=3.8045
+Epoch 46: CapLoss=3.8229
+Epoch 47: CapLoss=3.8199
+Epoch 48: CapLoss=3.7841 | B1=0.5699 B4=0.1819 C=0.5175
+Epoch 49: CapLoss=3.7945
+Epoch 50: CapLoss=3.7789
+Epoch 51: CapLoss=3.7814
+Epoch 52: CapLoss=3.7788
+Epoch 53: CapLoss=3.7565
+Epoch 54: CapLoss=3.7611 | B1=0.5319 B4=0.1575 C=0.4724
+Epoch 55: CapLoss=3.7556
+Epoch 56: CapLoss=3.7519
+Epoch 57: CapLoss=3.7527
+
+Interrupted at epoch 58
+
+===== Session resumed @ 2026-09-07 14:58:03 =====
+Resumed from epoch 58
+Epoch 59: fold 19/20 | CapLoss=3.7349 | lr=0.0001 | 471s
+Epoch 60: fold 20/20 | CapLoss=3.7313 | ValLoss=3.7212 | lr=0.0001 | 566s | B1=0.5425 B4=0.1692 C=0.5191
+
+Interrupted at epoch 61
+
+===== Session resumed @ 2026-09-07 16:42:26 =====
+Resumed from epoch 61
+Epoch 62: fold 2/20 | CapLoss=3.7379 | lr=0.0001 | 480s
+Epoch 63: fold 3/20 | CapLoss=3.7126 | lr=0.0001 | 415s
+Epoch 64: fold 4/20 | CapLoss=3.7247 | lr=0.0001 | 409s
+Epoch 65: fold 5/20 | CapLoss=3.7165 | lr=0.0001 | 423s
+Epoch 66: fold 6/20 | CapLoss=3.7206 | lr=0.0001 | 444s | B1=0.5698 B4=0.1825 C=0.5412
+Epoch 67: fold 7/20 | CapLoss=3.7039 | lr=0.0001 | 427s
+Epoch 68: fold 8/20 | CapLoss=3.7197 | lr=0.0001 | 417s
+Epoch 69: fold 9/20 | CapLoss=3.7074 | lr=0.0001 | 414s
+Epoch 70: fold 10/20 | CapLoss=3.7093 | lr=0.0001 | 446s
+Epoch 71: fold 11/20 | CapLoss=3.6832 | lr=0.0001 | 424s
+Epoch 72: fold 12/20 | CapLoss=3.7064 | lr=0.0001 | 421s | B1=0.5280 B4=0.1804 C=0.4800
+Epoch 73: fold 13/20 | CapLoss=3.7002 | lr=0.0001 | 427s
+Epoch 74: fold 14/20 | CapLoss=3.6999 | lr=0.0001 | 445s
+Epoch 75: fold 15/20 | CapLoss=3.6968 | ValLoss=3.6706 | lr=0.0001 | 589s
+Epoch 76: fold 16/20 | CapLoss=3.6975 | lr=0.0001 | 437s
+Epoch 77: fold 17/20 | CapLoss=3.6920 | lr=0.0001 | 420s
+Epoch 78: fold 18/20 | CapLoss=3.6814 | lr=0.0001 | 477s | B1=0.5637 B4=0.2022 C=0.5953 *best*
+Epoch 79: fold 19/20 | CapLoss=3.6678 | lr=0.0001 | 448s
+Epoch 80: fold 20/20 | CapLoss=3.6635 | lr=0.0001 | 416s
+Epoch 81: fold 1/20 | CapLoss=3.6778 | lr=0.0001 | 426s
+
+Interrupted at epoch 82
+
+===== Session resumed @ 2026-09-07 21:16:24 =====
+Resumed from epoch 82
+Epoch 83: fold 3/20 | CapLoss=3.6502 | lr=0.0001 | 665s
+Epoch 84: fold 4/20 | CapLoss=3.6673 | lr=0.0001 | 469s | B1=0.5568 B4=0.1996 C=0.5866
+Epoch 85: fold 5/20 | CapLoss=3.6622 | lr=0.0001 | 428s
+Epoch 86: fold 6/20 | CapLoss=3.6688 | lr=0.0001 | 443s
+Epoch 87: fold 7/20 | CapLoss=3.6549 | lr=0.0001 | 437s
+Epoch 88: fold 8/20 | CapLoss=3.6716 | lr=0.0001 | 427s
+Epoch 89: fold 9/20 | CapLoss=3.6641 | lr=0.0001 | 427s
+Epoch 90: fold 10/20 | CapLoss=3.6720 | ValLoss=3.6529 | lr=0.0001 | 622s | B1=0.5744 B4=0.1853 C=0.5854
+Epoch 91: fold 11/20 | CapLoss=3.6450 | lr=0.0001 | 430s
+Epoch 92: fold 12/20 | CapLoss=3.6753 | lr=0.0001 | 434s
+Epoch 93: fold 13/20 | CapLoss=3.6724 | lr=0.0001 | 433s
+Epoch 94: fold 14/20 | CapLoss=3.6683 | lr=0.0001 | 451s
+Epoch 95: fold 15/20 | CapLoss=3.6679 | lr=0.0001 | 432s
+Epoch 96: fold 16/20 | CapLoss=3.6920 | lr=0.0001 | 419s | B1=0.5672 B4=0.1855 C=0.5441
+Epoch 97: fold 17/20 | CapLoss=3.7447 | lr=0.0001 | 433s
+Epoch 98: fold 18/20 | CapLoss=3.8145 | lr=0.0001 | 451s
+Epoch 99: fold 19/20 | CapLoss=3.8662 | lr=0.0001 | 438s
+Epoch 100: fold 20/20 | CapLoss=3.9144 | lr=0.0001 | 421s
+Epoch 101: fold 1/20 | CapLoss=3.9831 | lr=0.0001 | 437s
+Epoch 102: fold 2/20 | CapLoss=4.0540 | lr=0.0001 | 467s | B1=0.5580 B4=0.1796 C=0.5518
+Epoch 103: fold 3/20 | CapLoss=4.0776 | lr=0.0001 | 439s
+Epoch 104: fold 4/20 | CapLoss=6.0551 | lr=0.0001 | 424s
+Epoch 105: fold 5/20 | CapLoss=5.9242 | ValLoss=5.7194 | lr=0.0001 | 620s
+Epoch 106: fold 6/20 | CapLoss=5.7934 | lr=0.0001 | 497s
+Epoch 107: fold 7/20 | CapLoss=5.8340 | lr=0.0001 | 467s
+Epoch 108: fold 8/20 | CapLoss=5.8323 | lr=0.0001 | 422s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 109: fold 9/20 | CapLoss=5.8467 | lr=0.0001 | 440s
+Epoch 110: fold 10/20 | CapLoss=5.8145 | lr=0.0001 | 460s
+Epoch 111: fold 11/20 | CapLoss=5.7658 | lr=0.0001 | 440s
+Epoch 112: fold 12/20 | CapLoss=5.8495 | lr=0.0001 | 431s
+Epoch 113: fold 13/20 | CapLoss=5.9250 | lr=0.0001 | 438s
+Epoch 114: fold 14/20 | CapLoss=5.7119 | lr=0.0001 | 456s | B1=0.0367 B4=0.0003 C=0.0007
+Epoch 115: fold 15/20 | CapLoss=5.7538 | lr=0.0001 | 433s
+Epoch 116: fold 16/20 | CapLoss=5.7782 | lr=0.0001 | 424s
+Epoch 117: fold 17/20 | CapLoss=5.8077 | lr=0.0001 | 440s
+Epoch 118: fold 18/20 | CapLoss=5.7858 | lr=0.0001 | 452s
+Epoch 119: fold 19/20 | CapLoss=5.7169 | lr=0.0001 | 441s
+Epoch 120: fold 20/20 | CapLoss=5.6487 | ValLoss=5.6133 | lr=0.0001 | 596s | B1=0.0006 B4=0.0000 C=0.0008
+Epoch 121: fold 1/20 | CapLoss=5.6550 | lr=0.0001 | 434s
+Epoch 122: fold 2/20 | CapLoss=5.7132 | lr=0.0001 | 503s
+Epoch 123: fold 3/20 | CapLoss=5.7028 | lr=0.0001 | 441s
+Epoch 124: fold 4/20 | CapLoss=5.7910 | lr=0.0001 | 435s
+Epoch 125: fold 5/20 | CapLoss=5.9388 | lr=0.0001 | 439s
+Epoch 126: fold 6/20 | CapLoss=5.9872 | lr=0.0001 | 469s | B1=0.0462 B4=0.0001 C=0.0043
+Epoch 127: fold 7/20 | CapLoss=6.1967 | lr=0.0001 | 447s
+Epoch 128: fold 8/20 | CapLoss=6.4860 | lr=0.0001 | 433s
+Epoch 129: fold 9/20 | CapLoss=7.3345 | lr=0.0001 | 437s
+Epoch 130: fold 10/20 | CapLoss=7.3066 | lr=0.0001 | 482s
+Epoch 131: fold 11/20 | CapLoss=7.1047 | lr=0.0001 | 432s
+Epoch 132: fold 12/20 | CapLoss=7.3036 | lr=0.0001 | 426s | B1=0.0497 B4=0.0002 C=0.0320
+Epoch 133: fold 13/20 | CapLoss=7.1335 | lr=0.0001 | 433s
+Epoch 134: fold 14/20 | CapLoss=7.2256 | lr=0.0001 | 469s
+Epoch 135: fold 15/20 | CapLoss=7.1089 | ValLoss=6.5184 | lr=0.0001 | 609s
+Epoch 136: fold 16/20 | CapLoss=7.2309 | lr=0.0001 | 456s
+Epoch 137: fold 17/20 | CapLoss=7.3684 | lr=0.0001 | 473s
+Epoch 138: fold 18/20 | CapLoss=7.6946 | lr=0.0001 | 455s | B1=0.0368 B4=0.0002 C=0.0000
+Epoch 139: fold 19/20 | CapLoss=7.6041 | lr=0.0001 | 435s
+Epoch 140: fold 20/20 | CapLoss=7.4149 | lr=0.0001 | 431s
+Epoch 141: fold 1/20 | CapLoss=7.2373 | lr=0.0001 | 426s
+Epoch 142: fold 2/20 | CapLoss=7.0264 | lr=0.0001 | 447s
+Epoch 143: fold 3/20 | CapLoss=6.7547 | lr=0.0001 | 431s
+Epoch 144: fold 4/20 | CapLoss=6.4682 | lr=0.0001 | 426s | B1=0.0378 B4=0.0001 C=0.0000
+Epoch 145: fold 5/20 | CapLoss=6.2488 | lr=0.0001 | 419s
+
+Interrupted at epoch 146
+
+===== Session resumed @ 2026-09-08 08:40:22 =====
+Resumed from epoch 146
+Epoch 147: fold 7/20 | CapLoss=5.9995 | lr=0.0001 | 422s
+Epoch 148: fold 8/20 | CapLoss=6.0284 | lr=0.0001 | 406s
+Epoch 149: fold 9/20 | CapLoss=6.0112 | lr=0.0001 | 405s
+Epoch 150: fold 10/20 | CapLoss=5.9735 | ValLoss=5.9218 | lr=0.0001 | 593s | B1=0.0365 B4=0.0002 C=0.0000
+Epoch 151: fold 11/20 | CapLoss=6.0386 | lr=0.0001 | 427s
+Epoch 152: fold 12/20 | CapLoss=5.9897 | lr=0.0001 | 414s
+Epoch 153: fold 13/20 | CapLoss=5.9249 | lr=0.0001 | 416s
+Epoch 154: fold 14/20 | CapLoss=5.8684 | lr=0.0001 | 448s
+Epoch 155: fold 15/20 | CapLoss=5.9111 | lr=0.0001 | 425s
+Epoch 156: fold 16/20 | CapLoss=5.8808 | lr=0.0001 | 422s | B1=0.0387 B4=0.0001 C=0.0023
+Epoch 157: fold 17/20 | CapLoss=5.8191 | lr=0.0001 | 429s
+
+Interrupted at epoch 158
+
+===== Session resumed @ 2026-09-08 10:39:32 =====
+Resumed from epoch 158
+Epoch 159: fold 19/20 | CapLoss=5.7994 | lr=0.0001 | 476s
+Epoch 160: fold 20/20 | CapLoss=5.9659 | lr=0.0001 | 416s
+Epoch 161: fold 1/20 | CapLoss=5.8227 | lr=0.0001 | 421s
+Epoch 162: fold 2/20 | CapLoss=5.8113 | lr=0.0001 | 442s | B1=0.0389 B4=0.0001 C=0.0000
+Epoch 163: fold 3/20 | CapLoss=5.7933 | lr=0.0001 | 422s
+Epoch 164: fold 4/20 | CapLoss=5.8098 | lr=0.0001 | 441s
+Epoch 165: fold 5/20 | CapLoss=5.8064 | ValLoss=6.2883 | lr=0.0001 | 600s
+Epoch 166: fold 6/20 | CapLoss=5.8213 | lr=0.0001 | 443s
+Epoch 167: fold 7/20 | CapLoss=6.5023 | lr=0.0001 | 426s
+Epoch 168: fold 8/20 | CapLoss=7.0046 | lr=0.0001 | 414s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 169: fold 9/20 | CapLoss=7.2410 | lr=0.0001 | 421s
+Epoch 170: fold 10/20 | CapLoss=7.3240 | lr=0.0001 | 440s
+Epoch 171: fold 11/20 | CapLoss=7.2513 | lr=0.0001 | 399s
+Epoch 172: fold 12/20 | CapLoss=7.1782 | lr=0.0001 | 281s
+Epoch 173: fold 13/20 | CapLoss=7.1756 | lr=0.0001 | 376s
+Epoch 174: fold 14/20 | CapLoss=7.1712 | lr=0.0001 | 369s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 175: fold 15/20 | CapLoss=7.1781 | lr=0.0001 | 282s
+Epoch 176: fold 16/20 | CapLoss=7.2166 | lr=0.0001 | 354s
+Epoch 177: fold 17/20 | CapLoss=7.2409 | lr=0.0001 | 370s
+Epoch 178: fold 18/20 | CapLoss=7.2880 | lr=0.0001 | 399s
+Epoch 179: fold 19/20 | CapLoss=7.4130 | lr=0.0001 | 439s
+Epoch 180: fold 20/20 | CapLoss=7.5964 | ValLoss=7.5463 | lr=0.0001 | 620s | B1=0.0210 B4=0.0002 C=0.0000
+Epoch 181: fold 1/20 | CapLoss=7.6050 | lr=0.0001 | 297s
+Epoch 182: fold 2/20 | CapLoss=7.6387 | lr=0.0001 | 347s
+Epoch 183: fold 3/20 | CapLoss=7.8335 | lr=0.0001 | 359s
+Epoch 184: fold 4/20 | CapLoss=8.5365 | lr=0.0001 | 336s
+Epoch 185: fold 5/20 | CapLoss=10.2980 | lr=0.0001 | 366s
+Epoch 186: fold 6/20 | CapLoss=10.9503 | lr=0.0001 | 432s | B1=0.0221 B4=0.0002 C=0.0000
+Epoch 187: fold 7/20 | CapLoss=12.2947 | lr=0.0001 | 294s
+Epoch 188: fold 8/20 | CapLoss=12.9732 | lr=0.0001 | 364s
+Epoch 189: fold 9/20 | CapLoss=13.4048 | lr=0.0001 | 390s
+
+Interrupted at epoch 190
+
+===== Session resumed @ 2026-09-08 16:15:43 =====
+Resumed from epoch 190
+Epoch 191: fold 11/20 | CapLoss=13.9837 | lr=0.0001 | 342s
+Epoch 192: fold 12/20 | CapLoss=14.3844 | lr=0.0001 | 273s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 193: fold 13/20 | CapLoss=14.1805 | lr=0.0001 | 272s
+Epoch 194: fold 14/20 | CapLoss=14.6848 | lr=0.0001 | 311s
+Epoch 195: fold 15/20 | CapLoss=15.1805 | ValLoss=15.5898 | lr=5e-05 | 553s
+Epoch 196: fold 16/20 | CapLoss=16.6688 | lr=0.0001 | 338s
+Epoch 197: fold 17/20 | CapLoss=17.2620 | lr=0.0001 | 361s
+Epoch 198: fold 18/20 | CapLoss=17.8605 | lr=0.0001 | 383s | B1=0.0056 B4=0.0001 C=0.0000
+Epoch 199: fold 19/20 | CapLoss=18.2399 | lr=0.0001 | 277s
+Epoch 200: fold 20/20 | CapLoss=18.1050 | lr=0.0001 | 327s
+Epoch 201: fold 1/20 | CapLoss=18.3749 | lr=0.0001 | 383s
+Epoch 202: fold 2/20 | CapLoss=18.5691 | lr=0.0001 | 409s
+Epoch 203: fold 3/20 | CapLoss=18.6666 | lr=0.0001 | 376s
+Epoch 204: fold 4/20 | CapLoss=20.0219 | lr=0.0001 | 346s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 205: fold 5/20 | CapLoss=21.3055 | lr=0.0001 | 307s
+Epoch 206: fold 6/20 | CapLoss=22.6045 | lr=0.0001 | 472s
+Epoch 207: fold 7/20 | CapLoss=22.9140 | lr=0.0001 | 406s
+Epoch 208: fold 8/20 | CapLoss=24.0204 | lr=0.0001 | 351s
+Epoch 209: fold 9/20 | CapLoss=24.1044 | lr=0.0001 | 372s
+Epoch 210: fold 10/20 | CapLoss=24.3502 | ValLoss=23.4766 | lr=0.0001 | 623s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 211: fold 11/20 | CapLoss=24.5879 | lr=0.0001 | 322s
+Epoch 212: fold 12/20 | CapLoss=24.6664 | lr=0.0001 | 310s
+Epoch 213: fold 13/20 | CapLoss=24.3170 | lr=0.0001 | 391s
+Epoch 214: fold 14/20 | CapLoss=25.2473 | lr=0.0001 | 402s
+Epoch 215: fold 15/20 | CapLoss=24.6668 | lr=0.0001 | 367s
+Epoch 216: fold 16/20 | CapLoss=24.2486 | lr=0.0001 | 379s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 217: fold 17/20 | CapLoss=24.7247 | lr=0.0001 | 296s
+Epoch 218: fold 18/20 | CapLoss=24.0797 | lr=0.0001 | 405s
+
+Interrupted at epoch 219
+
+===== Session resumed @ 2026-09-08 22:05:06 =====
+Resumed from epoch 219
+Epoch 220: fold 20/20 | CapLoss=23.5868 | lr=0.0001 | 462s
+Epoch 221: fold 1/20 | CapLoss=23.9946 | lr=0.0001 | 280s
+Epoch 222: fold 2/20 | CapLoss=24.2048 | lr=0.0001 | 354s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 223: fold 3/20 | CapLoss=24.7941 | lr=0.0001 | 277s
+Epoch 224: fold 4/20 | CapLoss=24.4691 | lr=0.0001 | 318s
+Epoch 225: fold 5/20 | CapLoss=24.8050 | ValLoss=23.4127 | lr=0.0001 | 576s
+Epoch 226: fold 6/20 | CapLoss=24.8829 | lr=0.0001 | 414s
+Epoch 227: fold 7/20 | CapLoss=24.8397 | lr=0.0001 | 377s
+Epoch 228: fold 8/20 | CapLoss=24.4167 | lr=0.0001 | 360s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 229: fold 9/20 | CapLoss=24.5835 | lr=0.0001 | 289s
+Epoch 230: fold 10/20 | CapLoss=24.3859 | lr=0.0001 | 392s
+Epoch 231: fold 11/20 | CapLoss=24.0080 | lr=0.0001 | 401s
+Epoch 232: fold 12/20 | CapLoss=24.2385 | lr=0.0001 | 363s
+Epoch 233: fold 13/20 | CapLoss=24.3672 | lr=0.0001 | 368s
+Epoch 234: fold 14/20 | CapLoss=23.5486 | lr=0.0001 | 461s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 235: fold 15/20 | CapLoss=24.3866 | lr=0.0001 | 289s
+Epoch 236: fold 16/20 | CapLoss=24.9858 | lr=0.0001 | 387s
+Epoch 237: fold 17/20 | CapLoss=24.4976 | lr=0.0001 | 379s
+Epoch 238: fold 18/20 | CapLoss=24.9336 | lr=0.0001 | 436s
+Epoch 239: fold 19/20 | CapLoss=24.9608 | lr=0.0001 | 409s
+Epoch 240: fold 20/20 | CapLoss=24.8304 | ValLoss=23.3764 | lr=0.0001 | 556s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 241: fold 1/20 | CapLoss=24.9687 | lr=0.0001 | 285s
+Epoch 242: fold 2/20 | CapLoss=24.5502 | lr=0.0001 | 377s
+Epoch 243: fold 3/20 | CapLoss=23.7048 | lr=0.0001 | 363s
+Epoch 244: fold 4/20 | CapLoss=24.5287 | lr=0.0001 | 347s
+Epoch 245: fold 5/20 | CapLoss=24.5587 | lr=0.0001 | 327s
+Epoch 246: fold 6/20 | CapLoss=24.4627 | lr=0.0001 | 514s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 247: fold 7/20 | CapLoss=24.6100 | lr=0.0001 | 300s
+Epoch 248: fold 8/20 | CapLoss=24.4793 | lr=0.0001 | 327s
+Epoch 249: fold 9/20 | CapLoss=24.5372 | lr=0.0001 | 298s
+Epoch 250: fold 10/20 | CapLoss=24.9316 | lr=0.0001 | 340s
+Epoch 251: fold 11/20 | CapLoss=24.5033 | lr=0.0001 | 357s
+Epoch 252: fold 12/20 | CapLoss=24.7459 | lr=0.0001 | 380s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 253: fold 13/20 | CapLoss=24.4486 | lr=0.0001 | 277s
+Epoch 254: fold 14/20 | CapLoss=25.0913 | lr=0.0001 | 429s
+Epoch 255: fold 15/20 | CapLoss=24.7913 | ValLoss=23.3966 | lr=0.0001 | 591s
+Epoch 256: fold 16/20 | CapLoss=24.2921 | lr=0.0001 | 354s
+Epoch 257: fold 17/20 | CapLoss=24.7615 | lr=0.0001 | 369s
+Epoch 258: fold 18/20 | CapLoss=24.7675 | lr=0.0001 | 448s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 259: fold 19/20 | CapLoss=24.2782 | lr=0.0001 | 292s
+Epoch 260: fold 20/20 | CapLoss=24.2447 | lr=0.0001 | 312s
+Epoch 261: fold 1/20 | CapLoss=24.0761 | lr=0.0001 | 400s
+Epoch 262: fold 2/20 | CapLoss=24.3099 | lr=0.0001 | 445s
+Epoch 263: fold 3/20 | CapLoss=24.5003 | lr=0.0001 | 382s
+Epoch 264: fold 4/20 | CapLoss=24.1755 | lr=0.0001 | 388s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 265: fold 5/20 | CapLoss=24.7007 | lr=0.0001 | 300s
+Epoch 266: fold 6/20 | CapLoss=24.4317 | lr=0.0001 | 461s
+Epoch 267: fold 7/20 | CapLoss=24.2536 | lr=0.0001 | 446s
+Epoch 268: fold 8/20 | CapLoss=24.3351 | lr=0.0001 | 383s
+Epoch 269: fold 9/20 | CapLoss=24.3249 | lr=0.0001 | 426s
+Epoch 270: fold 10/20 | CapLoss=25.0244 | ValLoss=23.4793 | lr=0.0001 | 732s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 271: fold 11/20 | CapLoss=24.9588 | lr=0.0001 | 305s
+Epoch 272: fold 12/20 | CapLoss=24.4862 | lr=0.0001 | 395s
+Epoch 273: fold 13/20 | CapLoss=24.6281 | lr=0.0001 | 380s
+Epoch 274: fold 14/20 | CapLoss=24.3608 | lr=0.0001 | 409s
+Epoch 275: fold 15/20 | CapLoss=23.6779 | lr=0.0001 | 404s
+Epoch 276: fold 16/20 | CapLoss=24.7830 | lr=0.0001 | 380s | B1=0.0006 B4=0.0000 C=0.0000
+Epoch 277: fold 17/20 | CapLoss=24.4902 | lr=0.0001 | 316s
+Epoch 278: fold 18/20 | CapLoss=24.1612 | lr=0.0001 | 522s
+Epoch 279: fold 19/20 | CapLoss=24.4777 | lr=0.0001 | 459s
+Epoch 280: fold 20/20 | CapLoss=24.6898 | lr=0.0001 | 423s
+Epoch 281: fold 1/20 | CapLoss=24.6889 | lr=0.0001 | 391s
+Epoch 282: fold 2/20 | CapLoss=24.7183 | lr=0.0001 | 399s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 283: fold 3/20 | CapLoss=24.6820 | lr=0.0001 | 323s
+Epoch 284: fold 4/20 | CapLoss=24.8191 | lr=0.0001 | 419s
+Epoch 285: fold 5/20 | CapLoss=24.7209 | ValLoss=23.3915 | lr=0.0001 | 651s
+Epoch 286: fold 6/20 | CapLoss=24.3937 | lr=0.0001 | 510s
+Epoch 287: fold 7/20 | CapLoss=24.3593 | lr=0.0001 | 453s
+Epoch 288: fold 8/20 | CapLoss=24.8140 | lr=0.0001 | 368s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 289: fold 9/20 | CapLoss=24.2296 | lr=0.0001 | 301s
+
+Interrupted at epoch 290
+
+===== Session resumed @ 2026-09-09 09:16:36 =====
+Resumed from epoch 290
+Epoch 291: fold 11/20 | CapLoss=24.2580 | lr=0.0001 | 498s
+Epoch 292: fold 12/20 | CapLoss=24.4842 | lr=0.0001 | 269s
+Epoch 293: fold 13/20 | CapLoss=24.9993 | lr=0.0001 | 272s
+Epoch 294: fold 14/20 | CapLoss=23.9508 | lr=0.0001 | 315s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 295: fold 15/20 | CapLoss=24.4330 | lr=0.0001 | 283s
+Epoch 296: fold 16/20 | CapLoss=24.8927 | lr=0.0001 | 337s
+Epoch 297: fold 17/20 | CapLoss=24.3776 | lr=0.0001 | 401s
+Epoch 298: fold 18/20 | CapLoss=24.1327 | lr=0.0001 | 373s
+Epoch 299: fold 19/20 | CapLoss=24.6187 | lr=0.0001 | 372s
+
+Interrupted at epoch 300
+
+===== Session resumed @ 2026-09-09 10:27:38 =====
+Resumed from epoch 300
+Epoch 301: fold 1/20 | CapLoss=24.7886 | lr=0.0001 | 471s
+Epoch 302: fold 2/20 | CapLoss=24.7924 | lr=0.0001 | 773s
+Epoch 303: fold 3/20 | CapLoss=24.5841 | lr=0.0001 | 387s
+Epoch 304: fold 4/20 | CapLoss=24.6906 | lr=0.0001 | 278s
+Epoch 305: fold 5/20 | CapLoss=24.7665 | lr=0.0001 | 271s
+Epoch 306: fold 6/20 | CapLoss=24.0585 | lr=0.0001 | 317s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 307: fold 7/20 | CapLoss=24.4220 | lr=0.0001 | 278s
+Epoch 308: fold 8/20 | CapLoss=24.8204 | lr=0.0001 | 331s
+Epoch 309: fold 9/20 | CapLoss=24.8958 | lr=0.0001 | 312s
+Epoch 310: fold 10/20 | CapLoss=24.7116 | lr=0.0001 | 337s
+Epoch 311: fold 11/20 | CapLoss=24.4415 | lr=0.0001 | 354s
+Epoch 312: fold 12/20 | CapLoss=24.9120 | lr=0.0001 | 347s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 313: fold 13/20 | CapLoss=24.0487 | lr=0.0001 | 282s
+Epoch 314: fold 14/20 | CapLoss=23.8963 | lr=0.0001 | 319s
+Epoch 315: fold 15/20 | CapLoss=24.7433 | ValLoss=23.3893 | lr=5e-05 | 502s
+Epoch 316: fold 16/20 | CapLoss=24.6587 | lr=0.0001 | 307s
+Epoch 317: fold 17/20 | CapLoss=24.6042 | lr=0.0001 | 303s
+Epoch 318: fold 18/20 | CapLoss=24.7843 | lr=0.0001 | 355s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 319: fold 19/20 | CapLoss=25.1299 | lr=0.0001 | 310s
+Epoch 320: fold 20/20 | CapLoss=24.3819 | lr=0.0001 | 291s
+Epoch 321: fold 1/20 | CapLoss=24.6448 | lr=0.0001 | 285s
+Epoch 322: fold 2/20 | CapLoss=24.9097 | lr=0.0001 | 335s
+Epoch 323: fold 3/20 | CapLoss=24.4983 | lr=0.0001 | 357s
+Epoch 324: fold 4/20 | CapLoss=24.3205 | lr=0.0001 | 303s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 325: fold 5/20 | CapLoss=24.8650 | lr=0.0001 | 332s
+Epoch 326: fold 6/20 | CapLoss=24.2225 | lr=0.0001 | 384s
+Epoch 327: fold 7/20 | CapLoss=24.2257 | lr=0.0001 | 317s
+Epoch 328: fold 8/20 | CapLoss=25.2479 | lr=0.0001 | 286s
+Epoch 329: fold 9/20 | CapLoss=25.1963 | lr=0.0001 | 287s
+Epoch 330: fold 10/20 | CapLoss=24.3930 | ValLoss=23.4106 | lr=0.0001 | 555s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 331: fold 11/20 | CapLoss=24.1432 | lr=0.0001 | 298s
+Epoch 332: fold 12/20 | CapLoss=24.4691 | lr=0.0001 | 314s
+Epoch 333: fold 13/20 | CapLoss=24.6363 | lr=0.0001 | 282s
+Epoch 334: fold 14/20 | CapLoss=24.8573 | lr=0.0001 | 339s
+
+Interrupted at epoch 335
+
+===== Session resumed @ 2026-09-09 15:58:32 =====
+Resumed from epoch 335
+Epoch 336: fold 16/20 | CapLoss=24.8979 | lr=0.0001 | 337s | B1=0.0013 B4=0.0000 C=0.0000
+Epoch 337: fold 17/20 | CapLoss=24.8711 | lr=0.0001 | 289s
+Epoch 338: fold 18/20 | CapLoss=24.8212 | lr=0.0001 | 355s
+Epoch 339: fold 19/20 | CapLoss=24.7532 | lr=0.0001 | 288s
+Epoch 340: fold 20/20 | CapLoss=24.2158 | lr=0.0001 | 349s
+Epoch 341: fold 1/20 | CapLoss=24.2847 | lr=0.0001 | 352s
+Epoch 342: fold 2/20 | CapLoss=24.4072 | lr=0.0001 | 339s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 343: fold 3/20 | CapLoss=23.8757 | lr=0.0001 | 272s
+Epoch 344: fold 4/20 | CapLoss=24.6260 | lr=0.0001 | 328s
+Epoch 345: fold 5/20 | CapLoss=24.3699 | ValLoss=23.3626 | lr=0.0001 | 531s
+Epoch 346: fold 6/20 | CapLoss=24.3665 | lr=0.0001 | 413s
+Epoch 347: fold 7/20 | CapLoss=24.6397 | lr=0.0001 | 354s
+Epoch 348: fold 8/20 | CapLoss=24.6444 | lr=0.0001 | 343s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 349: fold 9/20 | CapLoss=24.6741 | lr=0.0001 | 276s
+Epoch 350: fold 10/20 | CapLoss=24.8249 | lr=0.0001 | 325s
+Epoch 351: fold 11/20 | CapLoss=24.4817 | lr=0.0001 | 354s
+Epoch 352: fold 12/20 | CapLoss=24.4665 | lr=0.0001 | 366s
+Epoch 353: fold 13/20 | CapLoss=24.3712 | lr=0.0001 | 349s
+Epoch 354: fold 14/20 | CapLoss=25.1977 | lr=0.0001 | 362s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 355: fold 15/20 | CapLoss=24.7580 | lr=0.0001 | 297s
+Epoch 356: fold 16/20 | CapLoss=24.9191 | lr=0.0001 | 375s
+Epoch 357: fold 17/20 | CapLoss=24.2600 | lr=0.0001 | 389s
+Epoch 358: fold 18/20 | CapLoss=23.9779 | lr=0.0001 | 364s
+Epoch 359: fold 19/20 | CapLoss=24.8051 | lr=0.0001 | 388s
+Epoch 360: fold 20/20 | CapLoss=24.5747 | ValLoss=23.3757 | lr=0.0001 | 584s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 361: fold 1/20 | CapLoss=24.9580 | lr=0.0001 | 282s
+Epoch 362: fold 2/20 | CapLoss=24.7701 | lr=0.0001 | 321s
+Epoch 363: fold 3/20 | CapLoss=24.4731 | lr=0.0001 | 328s
+Epoch 364: fold 4/20 | CapLoss=24.4577 | lr=0.0001 | 299s
+Epoch 365: fold 5/20 | CapLoss=24.6804 | lr=0.0001 | 429s
+
+Interrupted at epoch 366
+
+===== Session resumed @ 2026-09-09 21:56:21 =====
+Resumed from epoch 366
+Epoch 367: fold 7/20 | CapLoss=24.3683 | lr=0.0001 | 480s
+Epoch 368: fold 8/20 | CapLoss=25.4924 | lr=0.0001 | 273s
+Epoch 369: fold 9/20 | CapLoss=24.8871 | lr=0.0001 | 276s
+Epoch 370: fold 10/20 | CapLoss=24.7459 | lr=0.0001 | 308s
+Epoch 371: fold 11/20 | CapLoss=23.7432 | lr=0.0001 | 313s
+Epoch 372: fold 12/20 | CapLoss=24.0314 | lr=0.0001 | 331s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 373: fold 13/20 | CapLoss=24.4626 | lr=0.0001 | 277s
+Epoch 374: fold 14/20 | CapLoss=24.4398 | lr=0.0001 | 423s
+Epoch 375: fold 15/20 | CapLoss=24.6619 | ValLoss=23.4008 | lr=0.0001 | 543s
+Epoch 376: fold 16/20 | CapLoss=24.8040 | lr=0.0001 | 488s
+Epoch 377: fold 17/20 | CapLoss=24.6969 | lr=0.0001 | 380s
+Epoch 378: fold 18/20 | CapLoss=24.7195 | lr=0.0001 | 338s | B1=0.0003 B4=0.0000 C=0.0000
+Epoch 379: fold 19/20 | CapLoss=24.3140 | lr=0.0001 | 281s
+Epoch 380: fold 20/20 | CapLoss=24.4598 | lr=0.0001 | 344s
+Epoch 381: fold 1/20 | CapLoss=24.0556 | lr=0.0001 | 389s
+Epoch 382: fold 2/20 | CapLoss=24.3690 | lr=0.0001 | 387s
+Epoch 383: fold 3/20 | CapLoss=24.3147 | lr=0.0001 | 361s
+Epoch 384: fold 4/20 | CapLoss=24.1345 | lr=0.0001 | 314s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 385: fold 5/20 | CapLoss=24.7877 | lr=0.0001 | 284s
+Epoch 386: fold 6/20 | CapLoss=24.7450 | lr=0.0001 | 424s
+Epoch 387: fold 7/20 | CapLoss=24.0862 | lr=0.0001 | 397s
+Epoch 388: fold 8/20 | CapLoss=24.7915 | lr=0.0001 | 361s
+Epoch 389: fold 9/20 | CapLoss=24.4127 | lr=0.0001 | 364s
+Epoch 390: fold 10/20 | CapLoss=24.6763 | ValLoss=23.4145 | lr=0.0001 | 571s | B1=0.0001 B4=0.0000 C=0.0000
+Epoch 391: fold 11/20 | CapLoss=24.5171 | lr=0.0001 | 283s
+Epoch 392: fold 12/20 | CapLoss=24.4078 | lr=0.0001 | 322s
+Epoch 393: fold 13/20 | CapLoss=23.9614 | lr=0.0001 | 314s
+Epoch 394: fold 14/20 | CapLoss=24.3118 | lr=0.0001 | 364s
+Epoch 395: fold 15/20 | CapLoss=24.4214 | lr=0.0001 | 370s
+Epoch 396: fold 16/20 | CapLoss=24.5418 | lr=0.0001 | 353s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 397: fold 17/20 | CapLoss=24.4619 | lr=0.0001 | 285s
+Epoch 398: fold 18/20 | CapLoss=24.5529 | lr=0.0001 | 318s
+Epoch 399: fold 19/20 | CapLoss=24.9011 | lr=0.0001 | 377s
+Epoch 400: fold 20/20 | CapLoss=24.9672 | lr=0.0001 | 335s
+Epoch 401: fold 1/20 | CapLoss=24.3103 | lr=0.0001 | 391s
+
+===== Session resumed @ 2026-09-10 09:11:57 =====
+Resumed from epoch 401
+Epoch 402: fold 2/20 | CapLoss=24.3969 | lr=0.0001 | 393s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 403: fold 3/20 | CapLoss=24.2961 | lr=0.0001 | 282s
+Epoch 404: fold 4/20 | CapLoss=24.8688 | lr=0.0001 | 273s
+Epoch 405: fold 5/20 | CapLoss=24.3475 | ValLoss=23.3854 | lr=0.0001 | 456s
+Epoch 406: fold 6/20 | CapLoss=24.2608 | lr=0.0001 | 342s
+Epoch 407: fold 7/20 | CapLoss=24.7474 | lr=0.0001 | 330s
+
+Interrupted at epoch 408
+
+===== Session resumed @ 2026-09-10 10:49:20 =====
+Resumed from epoch 408
+Epoch 409: fold 9/20 | CapLoss=24.7919 | lr=0.0001 | 353s
+Epoch 410: fold 10/20 | CapLoss=24.1798 | lr=0.0001 | 300s
+Epoch 411: fold 11/20 | CapLoss=24.0925 | lr=0.0001 | 300s
+Epoch 412: fold 12/20 | CapLoss=24.4328 | lr=0.0001 | 353s
+Epoch 413: fold 13/20 | CapLoss=24.9123 | lr=0.0001 | 328s
+Epoch 414: fold 14/20 | CapLoss=24.6293 | lr=0.0001 | 353s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 415: fold 15/20 | CapLoss=24.4514 | lr=0.0001 | 289s
+Epoch 416: fold 16/20 | CapLoss=24.6321 | lr=0.0001 | 359s
+Epoch 417: fold 17/20 | CapLoss=24.7817 | lr=0.0001 | 322s
+Epoch 418: fold 18/20 | CapLoss=24.4519 | lr=0.0001 | 350s
+Epoch 419: fold 19/20 | CapLoss=24.2697 | lr=0.0001 | 339s
+Epoch 420: fold 20/20 | CapLoss=24.6559 | ValLoss=23.4114 | lr=5e-05 | 596s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 421: fold 1/20 | CapLoss=24.0472 | lr=0.0001 | 299s
+Epoch 422: fold 2/20 | CapLoss=24.4493 | lr=0.0001 | 327s
+Epoch 423: fold 3/20 | CapLoss=24.6373 | lr=0.0001 | 341s
+Epoch 424: fold 4/20 | CapLoss=24.1837 | lr=0.0001 | 266s
+Epoch 425: fold 5/20 | CapLoss=25.0237 | lr=0.0001 | 277s
+Epoch 426: fold 6/20 | CapLoss=24.8422 | lr=0.0001 | 310s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 427: fold 7/20 | CapLoss=24.5712 | lr=0.0001 | 281s
+Epoch 428: fold 8/20 | CapLoss=24.5878 | lr=0.0001 | 298s
+Epoch 429: fold 9/20 | CapLoss=24.3590 | lr=0.0001 | 290s
+Epoch 430: fold 10/20 | CapLoss=24.9882 | lr=0.0001 | 323s
+Epoch 431: fold 11/20 | CapLoss=24.3144 | lr=0.0001 | 330s
+Epoch 432: fold 12/20 | CapLoss=24.6866 | lr=0.0001 | 315s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 433: fold 13/20 | CapLoss=24.9261 | lr=0.0001 | 269s
+Epoch 434: fold 14/20 | CapLoss=24.3628 | lr=0.0001 | 310s
+Epoch 435: fold 15/20 | CapLoss=24.3617 | ValLoss=23.3988 | lr=0.0001 | 495s
+Epoch 436: fold 16/20 | CapLoss=24.6538 | lr=0.0001 | 297s
+Epoch 437: fold 17/20 | CapLoss=24.4377 | lr=0.0001 | 294s
+Epoch 438: fold 18/20 | CapLoss=24.2352 | lr=0.0001 | 349s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 439: fold 19/20 | CapLoss=24.4225 | lr=0.0001 | 301s
+Epoch 440: fold 20/20 | CapLoss=24.3043 | lr=0.0001 | 307s
+
+Interrupted at epoch 441
+
+===== Session resumed @ 2026-09-10 16:21:44 =====
+Resumed from epoch 441
+Epoch 442: fold 2/20 | CapLoss=24.3969 | lr=0.0001 | 341s
+Epoch 443: fold 3/20 | CapLoss=24.0706 | lr=0.0001 | 283s
+Epoch 444: fold 4/20 | CapLoss=24.0252 | lr=0.0001 | 275s | B1=0.0011 B4=0.0000 C=0.0000
+Epoch 445: fold 5/20 | CapLoss=24.3475 | lr=0.0001 | 280s
+Epoch 446: fold 6/20 | CapLoss=24.4748 | lr=0.0001 | 333s
+Epoch 447: fold 7/20 | CapLoss=24.4938 | lr=0.0001 | 334s
+Epoch 448: fold 8/20 | CapLoss=24.7571 | lr=0.0001 | 347s
+Epoch 449: fold 9/20 | CapLoss=24.7718 | lr=0.0001 | 404s
+Epoch 450: fold 10/20 | CapLoss=24.2907 | ValLoss=23.3736 | lr=0.0001 | 566s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 451: fold 11/20 | CapLoss=23.8355 | lr=0.0001 | 282s
+Epoch 452: fold 12/20 | CapLoss=24.3213 | lr=0.0001 | 338s
+Epoch 453: fold 13/20 | CapLoss=24.3397 | lr=0.0001 | 327s
+Epoch 454: fold 14/20 | CapLoss=24.8470 | lr=0.0001 | 348s
+Epoch 455: fold 15/20 | CapLoss=24.9706 | lr=0.0001 | 333s
+Epoch 456: fold 16/20 | CapLoss=24.3425 | lr=0.0001 | 369s | B1=0.0002 B4=0.0000 C=0.0000
+Epoch 457: fold 17/20 | CapLoss=24.5028 | lr=0.0001 | 281s
+Epoch 458: fold 18/20 | CapLoss=24.5213 | lr=0.0001 | 359s
+Epoch 459: fold 19/20 | CapLoss=24.6258 | lr=0.0001 | 347s
+Epoch 460: fold 20/20 | CapLoss=24.2878 | lr=0.0001 | 362s
+Epoch 461: fold 1/20 | CapLoss=24.5992 | lr=0.0001 | 394s
+Epoch 462: fold 2/20 | CapLoss=24.6186 | lr=0.0001 | 420s | B1=0.0000 B4=0.0000 C=0.0000
+Epoch 463: fold 3/20 | CapLoss=24.2999 | lr=0.0001 | 285s
+
+===== Session resumed @ 2026-09-11 09:09:17 =====
+Resumed from epoch 463
+Epoch 464: fold 4/20 | CapLoss=24.5090 | lr=0.0001 | 381s
+Epoch 465: fold 5/20 | CapLoss=24.4123 | ValLoss=23.3879 | lr=0.0001 | 465s
+
+Early stopping at epoch 465 (patience=24)
+============================================================
+Training complete. Best BLEU-4: 0.2022
+============================================================
