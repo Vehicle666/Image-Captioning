@@ -14,6 +14,9 @@ timeout /t 3 /nobreak >nul
 REM Start Flask app
 echo [2/2] Starting Flask app...
 echo.
+set STUDY_TAG=mobilenet_v3_clip
+set USE_V3=1
+set USE_CLIP=1
 python app.py
 
 pause

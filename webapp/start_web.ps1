@@ -12,6 +12,9 @@ Get-Process ngrok -ErrorAction SilentlyContinue | Stop-Process -Force
 Start-Sleep -Seconds 1
 
 Write-Host "[2/4] Starting Flask + ngrok in background..." -ForegroundColor Yellow
+$env:STUDY_TAG = "mobilenet_v3_clip"
+$env:USE_V3 = "1"
+$env:USE_CLIP = "1"
 Start-Process -FilePath $py -ArgumentList "app.py" -WorkingDirectory $webapp -WindowStyle Hidden `
     -RedirectStandardOutput (Join-Path $webapp "stdout.log") `
     -RedirectStandardError  (Join-Path $webapp "stderr.log")
